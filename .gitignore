@@ -1,0 +1,32 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Maven / Java
+target/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vue / Node
+vue/node_modules/
+vue/dist/
+vue/.env.local
+vue/.env.*.local
+
+# Vite cache (如果你用 Vite)
+vue/node_modules/.vite/
+
+# optional: lock files 是否提交按团队习惯
+# vue/package-lock.json
+# vue/yarn.lock
+# vue/pnpm-lock.yaml
+
+# Do NOT commit real secret configs
+src/main/resources/application-dev.yml
+src/main/resources/application-prod.yml
+_secrets_backup/
+src/main/resources/application-dev.yml
+src/main/resources/application-prod.yml
