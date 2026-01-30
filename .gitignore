@@ -28,5 +28,8 @@ vue/node_modules/.vite/
 src/main/resources/application-dev.yml
 src/main/resources/application-prod.yml
 _secrets_backup/
+
+# Do NOT commit real secret configs
 src/main/resources/application-dev.yml
 src/main/resources/application-prod.yml
+_secrets_backup/

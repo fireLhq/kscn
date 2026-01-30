@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.kscn.mapper.ProjectMemberMapper">
+    <resultMap id="ProjectMemberDTOMap" type="top.kscn.entity.dto.ProjectMemberDTO">
+        <result property="memberId" column="member_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="role" column="role"/>
+        <result property="description" column="description"/>
+        <result property="skills" column="skills" typeHandler="top.kscn.handler.JsonListTypeHandler"/>
+        <result property="type" column="type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+
+        <!-- 嵌套 User 对象 -->
+        <association property="user" javaType="top.kscn.entity.User">
+            <result property="userId" column="user_id"/>
+            <result property="username" column="username"/>
+            <result property="nickname" column="nickname"/>
+            <result property="avatar" column="avatar"/>
+            <result property="email" column="email"/>
+            <result property="sex" column="sex"/>
+            <result property="birthday" column="birthday"/>
+            <result property="synopsis" column="synopsis"/>
+            <result property="status" column="status"/>
+            <result property="role" column="user_role"/>
+        </association>
+    </resultMap>
+
+    <select id="projectMemberList" parameterType="top.kscn.entity.dto.ProjectMemberDTO" resultMap="ProjectMemberDTOMap">
+        SELECT
+        pm.member_id,
+        pm.user_id,
+        pm.role,
+        pm.description,
+        pm.skills,
+        pm.type,
+        pm.create_time,
+        pm.update_time,
+        u.user_id,
+        u.username,
+        u.nickname,
+        u.avatar,
+        u.email,
+        u.sex,
+        u.birthday,
+        u.synopsis,
+        u.status,
+        u.role AS user_role
+        FROM project_member pm
+        LEFT JOIN user u ON pm.user_id = u.user_id
+        <where>
+            <if test="dto.role != null and dto.role != ''">
+                AND pm.role LIKE CONCAT('%', #{dto.role}, '%')
+            </if>
+            <if test="dto.type != null">
+                AND pm.type = #{dto.type}
+            </if>
+            <if test="dto.user != null and dto.user.username != null and dto.user.username != ''">
+                AND u.username LIKE CONCAT('%', #{dto.user.username}, '%')
+            </if>
+        </where>
+        ORDER BY pm.create_time DESC
+    </select>
+</mapper>
