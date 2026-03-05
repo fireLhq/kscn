@@ -102,7 +102,7 @@
                         <p>如果您对以上注意事项有任何疑问，或者发现平台存在违规行为，请及时联系我们：</p>
                         <div class="contact-details">
                             <p><strong>举报邮箱：</strong>lab_c919@qq.com</p>
-                            <p><strong>客服QQ：</strong>3011499075</p>
+                            <p><strong>Telegram：</strong>191-2268-5314</p>
                             <p><strong>工作时间：</strong>周一至周五 9:00-18:00</p>
                         </div>
                         <p class="note">我们会在收到反馈后尽快处理，感谢您的理解与支持！</p>

@@ -78,3 +78,43 @@ export function resetPassword(email, code, newPassword) {
         newPassword: newPassword
     });
 }
+
+// ==================== 头像管理 ====================
+
+/**
+ * 上传头像
+ */
+export function uploadAvatar(token, formData) {
+    return service.post("/regular/uploadAvatar", formData, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+        },
+    });
+}
+
+/**
+ * 获取头像URL
+ * @param {string} filename - 头像文件名
+ * @returns {string} 头像URL
+ */
+export function getAvatarUrl(filename) {
+    if (!filename || filename === "default_avatar.png") {
+        // 返回默认头像占位图
+        return "https://via.placeholder.com/40x40/409EFF/FFFFFF?text=U";
+    }
+    return `/api/user/auth/avatar/${filename}`;
+}
+
+export default {
+    getUserInfo,
+    updateUserInfo,
+    updateUsername,
+    updateEmail,
+    updatePassword,
+    sendEmailVerificationCode,
+    sendPasswordResetCode,
+    resetPassword,
+    uploadAvatar,
+    getAvatarUrl
+};

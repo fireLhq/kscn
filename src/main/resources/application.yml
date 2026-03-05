@@ -9,6 +9,7 @@ spring:
     multipart:
       max-file-size: 500MB # 单个文件最大大小
       max-request-size: 25GB # 整个请求最大大小（多个文件总和）
+
 server:
   port: 8848
   servlet:

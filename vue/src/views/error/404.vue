@@ -7,7 +7,10 @@
             </template>
             <p class="error-code">404 - Not Found</p>
             <p class="error-message">您访问的页面不存在</p>
-            <el-button type="primary" icon="el-icon-house" @click="$router.push('/')"> 返回首页 </el-button>
+            <el-button-group>
+                <el-button type="primary" icon="el-icon-back" @click="$router.go(-1)">返回</el-button>
+                <el-button icon="el-icon-house" @click="$router.push('/')">首页</el-button>
+            </el-button-group>
         </el-empty>
     </div>
 </template>

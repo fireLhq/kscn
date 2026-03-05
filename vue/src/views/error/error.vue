@@ -7,8 +7,8 @@
             </template>
             <p class="error-code">{{ errorCode }} - {{ errorMessage }}</p>
             <el-button-group>
-                <el-button type="primary" icon="el-icon-refresh-left" @click="$router.go(-1)"> 返回上一页 </el-button>
-                <el-button icon="el-icon-house" @click="$router.push('/')"> 返回首页 </el-button>
+                <el-button type="primary" icon="el-icon-back" @click="$router.go(-1)">返回</el-button>
+                <el-button icon="el-icon-house" @click="$router.push('/')">首页</el-button>
             </el-button-group>
         </el-empty>
     </div>

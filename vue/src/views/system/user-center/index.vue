@@ -305,22 +305,89 @@
             </span>
         </el-dialog>
 
+        <!-- 头像裁剪上传对话框 -->
+        <el-dialog
+            title="上传头像"
+            :visible.sync="showAvatarDialog"
+            width="600px"
+            :close-on-click-modal="false"
+            @close="resetAvatarDialog"
+        >
+            <div class="avatar-upload-container">
+                <!-- 步骤1: 选择图片 -->
+                <div v-if="!avatarFile" class="upload-area">
+                    <el-upload
+                        class="avatar-uploader"
+                        action="#"
+                        :show-file-list="false"
+                        :on-change="handleAvatarSelect"
+                        :auto-upload="false"
+                        accept="image/*"
+                        drag
+                    >
+                        <i class="el-icon-upload"></i>
+                        <div class="el-upload__text">将图片拖到此处，或<em>点击选择</em></div>
+                        <div class="el-upload__tip" slot="tip">支持 JPG、PNG、GIF 格式，文件大小不超过 10MB</div>
+                    </el-upload>
+                </div>
+
+                <!-- 步骤2: 裁剪图片 -->
+                <div v-else class="cropper-area">
+                    <div class="cropper-container-full">
+                        <vueCropper
+                            ref="cropper"
+                            :img="avatarPreview"
+                            :outputSize="1"
+                            :outputType="'png'"
+                            :info="true"
+                            :full="false"
+                            :canMove="true"
+                            :canMoveBox="true"
+                            :fixedBox="false"
+                            :original="false"
+                            :autoCrop="true"
+                            :autoCropWidth="256"
+                            :autoCropHeight="256"
+                            :centerBox="true"
+                            :high="true"
+                            :fixed="true"
+                            :fixedNumber="[1, 1]"
+                            mode="cover"
+                        ></vueCropper>
+                    </div>
+                </div>
+            </div>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="resetAvatarDialog" v-if="!avatarFile">取消</el-button>
+                <el-button @click="resetAvatarSelection" v-if="avatarFile">重新选择</el-button>
+                <el-button type="primary" @click="uploadAvatar" :loading="avatarUploading" v-if="avatarFile">
+                    {{ avatarUploading ? '上传中...' : '确认上传' }}
+                </el-button>
+            </span>
+        </el-dialog>
+
     </div>
 </template>
 
 <script>
+import { VueCropper } from 'vue-cropper';
 import { 
     getUserInfo, 
     updateUserInfo, 
     updateUsername, 
     updateEmail, 
     updatePassword,
-    sendEmailVerificationCode 
+    sendEmailVerificationCode,
+    uploadAvatar
 } from "@/api/system/user";
 import { getUserAvatarUrl } from "@/utils/avatarUtils";
 
 export default {
     name: "ProfileView",
+    components: {
+        VueCropper
+    },
     data() {
         // 密码确认验证
         const validateConfirmPassword = (rule, value, callback) => {
@@ -336,9 +403,13 @@ export default {
             showUsernameDialog: false,
             showPasswordDialog: false,
             showEmailDialog: false,
+            showAvatarDialog: false,
             countdown: 0,
             loading: false,
             dataError: false,
+            avatarUploading: false,
+            avatarFile: null,
+            avatarPreview: '',
             userInfo: {
                 username: "",
                 email: "",
@@ -444,6 +515,19 @@ export default {
                 // 登录状态从true变为false，说明token失效，跳转到登录页
                 this.$router.push('/login?redirect=' + encodeURIComponent('/user-center'));
             }
+        },
+        // 监听 avatarFile 变化
+        avatarFile(newVal) {
+            console.log('avatarFile 变化:', newVal);
+            if (newVal) {
+                console.log('avatarFile 已设置，应该显示裁剪区域');
+            } else {
+                console.log('avatarFile 为空，应该显示上传区域');
+            }
+        },
+        // 监听 avatarPreview 变化
+        avatarPreview(newVal) {
+            console.log('avatarPreview 变化，长度:', newVal ? newVal.length : 0);
         }
     },
     async mounted() {
@@ -497,7 +581,104 @@ export default {
             return new Date(dateString).toLocaleString("zh-CN");
         },
         editAvatar() { 
-            this.$message.info("头像编辑功能开发中..."); 
+            if (!this.isLoggedIn) {
+                this.$message.warning("请先登录");
+                return;
+            }
+            this.showAvatarDialog = true;
+        },
+        handleAvatarSelect(file, fileList) {
+            console.log('选择文件:', file);
+            
+            // on-change 事件传递的是 { raw: File, ... } 对象
+            const rawFile = file.raw;
+            
+            if (!rawFile) {
+                console.error('无法获取文件对象');
+                return;
+            }
+            
+            // 验证文件类型
+            const isImage = rawFile.type.startsWith('image/');
+            if (!isImage) {
+                this.$message.error('只能上传图片文件！');
+                return;
+            }
+            
+            // 验证文件大小（10MB）
+            const isLt10M = rawFile.size / 1024 / 1024 < 10;
+            if (!isLt10M) {
+                this.$message.error('图片大小不能超过 10MB！');
+                return;
+            }
+            
+            console.log('文件验证通过，开始读取...');
+            
+            // 读取文件并显示预览
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                console.log('文件读取完成');
+                this.avatarPreview = e.target.result;
+                this.avatarFile = rawFile;
+                console.log('avatarFile 已设置:', this.avatarFile);
+                console.log('avatarPreview 长度:', this.avatarPreview.length);
+            };
+            reader.onerror = (e) => {
+                console.error('文件读取失败:', e);
+                this.$message.error('文件读取失败，请重试');
+            };
+            reader.readAsDataURL(rawFile);
+        },
+        resetAvatarSelection() {
+            this.avatarFile = null;
+            this.avatarPreview = '';
+        },
+        resetAvatarDialog() {
+            this.showAvatarDialog = false;
+            this.resetAvatarSelection();
+        },
+        async uploadAvatar() {
+            if (!this.avatarFile) {
+                this.$message.warning('请先选择图片');
+                return;
+            }
+            
+            this.avatarUploading = true;
+            
+            try {
+                // 获取裁剪后的图片 blob
+                this.$refs.cropper.getCropBlob(async (blob) => {
+                    try {
+                        // 创建 FormData
+                        const formData = new FormData();
+                        formData.append('file', blob, 'avatar.png');
+                        
+                        // 上传
+                        const token = this.$store.state.token;
+                        const res = await uploadAvatar(token, formData);
+                        
+                        if (res.data.code === 200) {
+                            this.$message.success('头像上传成功！');
+                            this.resetAvatarDialog();
+                            // 重新加载用户信息以更新头像
+                            await this.loadUserInfo();
+                            // 通知导航栏刷新头像
+                            this.$root.$emit('refreshNavbarAvatar');
+                        } else {
+                            this.$message.error(res.data.message || '上传失败');
+                        }
+                    } catch (error) {
+                        console.error('上传失败:', error);
+                        this.$message.error('上传失败，请重试');
+                    } finally {
+                        this.avatarUploading = false;
+                    }
+                });
+            } catch (error) {
+                console.error('获取裁剪图片失败:', error);
+                this.$message.error('图片处理失败，请重试');
+                this.avatarUploading = false;
+            }
         },
         toggleBasicEdit() { 
             if (!this.isLoggedIn) {
@@ -653,12 +834,13 @@ export default {
         },
         getUserAvatarUrl,
         getAvatarUrl() {
-            // 如果未登录或数据错误，使用默认头像
-            if (!this.isLoggedIn || this.dataError || !this.userInfo.avatar) {
-                return require("@/assets/images/navbar/user.png");
+            // 如果未登录或数据错误，使用本地默认头像
+            if (!this.isLoggedIn || this.dataError) {
+                return require("@/assets/images/avatar/user.png");
             }
-            // 否则使用用户头像
-            return this.getUserAvatarUrl(this.userInfo);
+            // 否则使用用户头像（如果没有头像或是默认头像，getUserAvatarUrl 会返回 null）
+            const url = this.getUserAvatarUrl(this.userInfo);
+            return url || require("@/assets/images/avatar/user.png");
         }
     }
 };
@@ -1296,6 +1478,144 @@ export default {
     }
     .el-dialog__footer {
         padding: 0.4rem 0.8rem 0.8rem;
+    }
+}
+
+/* 头像上传裁剪样式 */
+.avatar-upload-container {
+    min-height: 400px;
+}
+
+.upload-area {
+    padding: 2rem 0;
+}
+
+.avatar-uploader {
+    width: 100%;
+}
+
+.avatar-uploader .el-upload {
+    width: 100%;
+}
+
+.avatar-uploader .el-upload-dragger {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-uploader .el-icon-upload {
+    font-size: 67px;
+    color: #c0c4cc;
+    margin-bottom: 16px;
+}
+
+.avatar-uploader .el-upload__text {
+    color: #606266;
+    font-size: 14px;
+}
+
+.avatar-uploader .el-upload__text em {
+    color: #409eff;
+    font-style: normal;
+}
+
+.avatar-uploader .el-upload__tip {
+    font-size: 12px;
+    color: #909399;
+    margin-top: 7px;
+    text-align: center;
+}
+
+.cropper-area {
+    display: flex;
+    width: 100%;
+}
+
+.cropper-container-full {
+    flex: 1;
+    width: 100%;
+    height: 400px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cropper-container {
+    flex: 1;
+    height: 400px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cropper-preview {
+    flex: 0 0 150px;
+    text-align: center;
+}
+
+.preview-title {
+    font-size: 14px;
+    color: #606266;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.preview-box {
+    width: 120px;
+    height: 120px;
+    border: 2px solid #e4e7ed;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-tips {
+    margin-top: 1rem;
+    font-size: 12px;
+    color: #909399;
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* 头像裁剪响应式 */
+@media (max-width: 768px) {
+    .avatar-upload-container {
+        min-height: 300px;
+    }
+    
+    .cropper-container-full {
+        width: 100%;
+        height: 300px;
+    }
+    
+    .avatar-uploader .el-upload-dragger {
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .avatar-upload-container {
+        min-height: 250px;
+    }
+    
+    .cropper-container-full {
+        height: 250px;
+    }
+    
+    .avatar-uploader .el-upload-dragger {
+        height: 180px;
+    }
+    
+    .avatar-uploader .el-icon-upload {
+        font-size: 50px;
     }
 }
 </style>

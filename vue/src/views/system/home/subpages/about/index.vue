@@ -15,6 +15,13 @@
                     <h2>项目简介</h2>
                     <p>KSCN（Knowledge Sharing and Collaboration Network）是一个致力于知识共享与协作的开源项目。我们相信知识的力量，希望通过技术手段构建一个开放、包容、高效的知识共享平台。</p>
                     <p>项目成立于2024年，由一群热爱技术、追求创新的开发者共同发起。我们致力于为用户提供优质的知识管理工具，促进知识的传播与创新。</p>
+                    <div class="open-source-notice">
+                        <i class="el-icon-star-on"></i>
+                        <div class="notice-content">
+                            <h4>开源项目</h4>
+                            <p>本项目完全开源，欢迎访问我们的 GitHub 仓库查看源码、提交问题或参与贡献。您可以自由使用、修改和分发本项目代码。</p>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="about-section">
@@ -105,7 +112,31 @@
                         </div>
                         <div class="contact-item">
                             <i class="el-icon-chat-dot-round"></i>
-                            <span>QQ群：暂无</span>
+                            <span>Telegram群：<a href="https://t.me/kscn_top" target="_blank">KSCN</a></span>
+                        </div>
+                    </div>
+                    
+                    <div class="github-section">
+                        <div class="github-card">
+                            <div class="github-icon">
+                                <i class="el-icon-link"></i>
+                            </div>
+                            <div class="github-content">
+                                <h3>开源仓库</h3>
+                                <p>欢迎访问我们的 GitHub 仓库，查看完整源码、提交问题反馈或参与项目开发</p>
+                                <el-button type="primary" icon="el-icon-link" @click="openGithub">
+                                    访问 GitHub 仓库
+                                </el-button>
+                            </div>
+                        </div>
+                        <div class="github-tips">
+                            <h4><i class="el-icon-info"></i> 如何参与贡献？</h4>
+                            <ul>
+                                <li>⭐ Star 项目以表示支持</li>
+                                <li>🐛 提交 Issue 报告问题或建议</li>
+                                <li>🔧 Fork 项目并提交 Pull Request</li>
+                                <li>📖 完善项目文档和示例</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -122,6 +153,12 @@ export default {
             // 页面数据
         };
     },
+    methods: {
+        openGithub() {
+            // 替换为实际的 GitHub 仓库地址
+            window.open('https://github.com/fireLhq/kscn', '_blank');
+        }
+    }
 };
 </script>
 
@@ -318,6 +355,138 @@ export default {
     color: #495057;
 }
 
+.contact-item a {
+    color: #0088cc;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.contact-item a:hover {
+    color: #006699;
+    background: rgba(0, 136, 204, 0.1);
+}
+
+.contact-item a::before {
+    content: '✈️';
+    margin-right: 4px;
+    font-size: 14px;
+}
+
+.open-source-notice {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+}
+
+.open-source-notice i {
+    font-size: 32px;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
+.notice-content h4 {
+    font-size: 20px;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+}
+
+.notice-content p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.github-section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 2px dashed #e9ecef;
+}
+
+.github-card {
+    display: flex;
+    align-items: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%);
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 24px;
+}
+
+.github-icon {
+    font-size: 48px;
+    margin-right: 24px;
+    flex-shrink: 0;
+}
+
+.github-content {
+    flex: 1;
+}
+
+.github-content h3 {
+    font-size: 24px;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+}
+
+.github-content p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.github-content .el-button {
+    background: #28a745;
+    border-color: #28a745;
+}
+
+.github-content .el-button:hover {
+    background: #218838;
+    border-color: #1e7e34;
+}
+
+.github-tips {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+.github-tips h4 {
+    font-size: 18px;
+    color: #212529;
+    margin: 0 0 12px 0;
+    font-weight: 600;
+}
+
+.github-tips h4 i {
+    color: #28a745;
+    margin-right: 8px;
+}
+
+.github-tips ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.github-tips li {
+    font-size: 14px;
+    color: #495057;
+    line-height: 2;
+    padding-left: 8px;
+}
+
 @media (max-width: 768px) {
     .about-body {
         width: 95%;
@@ -341,6 +510,26 @@ export default {
     .tech-features,
     .contact-info {
         grid-template-columns: 1fr;
+    }
+    
+    .github-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .github-icon {
+        margin-right: 0;
+        margin-bottom: 16px;
+    }
+    
+    .open-source-notice {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .open-source-notice i {
+        margin-right: 0;
+        margin-bottom: 12px;
     }
 }
 </style>

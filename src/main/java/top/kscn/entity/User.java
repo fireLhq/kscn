@@ -82,4 +82,14 @@ public class User {
      * 修改时间
      */
     private Date updateTime;
+
+    /**
+     * 总空间字节数（默认10GB）
+     */
+    private Long totalSpace;
+
+    /**
+     * 已使用空间字节数
+     */
+    private Long usedSpace;
 }

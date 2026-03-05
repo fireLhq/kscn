@@ -178,10 +178,10 @@
                     <div class="contact-info">
                         <p>如果您有任何赞助相关的问题，或者希望了解更详细的赞助方案，请随时联系我们：</p>
                         <div class="contact-details">
-                            <p><strong>QQ：</strong>3011499075</p>
                             <p><strong>邮箱：</strong>lab_c919@qq.com</p>
+                            <p><strong>QID：</strong>AirC919</p>
                             <p><strong>微信：</strong>DiracEq</p>
-                            <p><strong>Telegram：</strong>19122685314</p>
+                            <p><strong>Telegram：</strong>191-2268-5314</p>
                         </div>
                     </div>
                 </div>

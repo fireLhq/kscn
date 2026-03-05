@@ -1,61 +1,55 @@
 /**
  * 头像工具函数
  * 统一处理头像URL的拼接和格式化
+ * 企业标准实现：通过后端API访问头像，不依赖静态资源路径
  */
 
 // 头像基础路径配置
 const AVATAR_CONFIG = {
-    // 头像文件服务器基础路径
-    BASE_PATH: '/api/static/image/avatar/',
-    // 默认头像URL（当用户没有头像时使用）
-    DEFAULT_AVATAR: 'https://via.placeholder.com/40x40/409EFF/FFFFFF?text=U'
+    // 头像API基础路径
+    BASE_PATH: '/api/user/auth/avatar/',
+    // 默认头像文件名（存储在后端头像目录中）
+    DEFAULT_AVATAR_FILENAME: 'default_avatar.png'
 };
 
 /**
  * 获取完整的头像URL
- * @param {string} avatarPath - 后端返回的头像路径（可能为空或null）
- * @param {string} fallbackText - 当使用默认头像时显示的文字（可选）
- * @returns {string} 完整的头像URL
+ * @param {string} avatarFilename - 后端返回的头像文件名（可能为空或null）
+ * @param {string} fallbackText - 当使用默认头像时显示的文字（可选，已废弃）
+ * @returns {string|null} 完整的头像URL，如果为空返回 null
  */
-export function getAvatarUrl(avatarPath, fallbackText = 'U') {
-    // 如果没有头像路径或为空字符串，返回默认头像
-    if (!avatarPath || avatarPath.trim() === '') {
-        return fallbackText ? 
-            `https://via.placeholder.com/40x40/409EFF/FFFFFF?text=${fallbackText}` : 
-            AVATAR_CONFIG.DEFAULT_AVATAR;
+export function getAvatarUrl(avatarFilename, fallbackText = 'U') {
+    // 只有当头像文件名为空或空字符串时，才返回 null 使用本地默认头像
+    if (!avatarFilename || avatarFilename.trim() === '') {
+        return null; // 返回 null，让调用方使用本地默认头像
     }
     
     // 如果已经是完整的URL（包含http://或https://），直接返回
-    if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
-        return avatarPath;
+    if (avatarFilename.startsWith('http://') || avatarFilename.startsWith('https://')) {
+        return avatarFilename;
     }
     
-    // 如果是本地资源路径（以/开头或者是webpack处理的资源），直接返回
-    if (avatarPath.startsWith('/') || avatarPath.includes('static/') || avatarPath.includes('assets/')) {
-        return avatarPath;
-    }
-    
-    // 拼接基础路径和头像文件名
-    return AVATAR_CONFIG.BASE_PATH + avatarPath;
+    // 拼接API路径和头像文件名（包括 default_avatar.png），添加时间戳避免缓存
+    const timestamp = new Date().getTime();
+    return AVATAR_CONFIG.BASE_PATH + avatarFilename + '?t=' + timestamp;
 }
 
 /**
  * 获取用户头像URL（带用户信息）
  * @param {Object} user - 用户对象
- * @param {string} user.avatar - 用户头像路径
+ * @param {string} user.avatar - 用户头像文件名
  * @param {string} user.nickname - 用户昵称
  * @param {string} user.username - 用户名
- * @returns {string} 完整的头像URL
+ * @returns {string|null} 完整的头像URL，如果是默认头像返回 null
  */
 export function getUserAvatarUrl(user) {
     if (!user) {
-        return AVATAR_CONFIG.DEFAULT_AVATAR;
+        return null; // 返回 null，让调用方使用本地默认头像
     }
     
-    const { avatar, nickname, username } = user;
-    const fallbackText = (nickname || username || 'U').charAt(0).toUpperCase();
+    const { avatar } = user;
     
-    return getAvatarUrl(avatar, fallbackText);
+    return getAvatarUrl(avatar);
 }
 
 /**

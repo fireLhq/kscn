@@ -74,18 +74,25 @@ export default {
             avatarName: "",
             userRole: null,
             tokenCheckTimer: null,
+            avatarTimestamp: Date.now(), // 用于强制刷新头像
         };
     },
     computed: {
         avatarUrl() {
+            // 引用 avatarTimestamp 确保头像更新时重新计算
+            const timestamp = this.avatarTimestamp;
+            
             if (this.isLoggedIn && (this.avatarName || this.username)) {
-                return getUserAvatarUrl({ 
+                const url = getUserAvatarUrl({ 
                     avatar: this.avatarName, 
                     nickname: this.nickname, 
                     username: this.username 
                 });
+                // 如果返回 null（默认头像），使用本地默认头像
+                return url || require("@/assets/images/avatar/user.png");
             }
-            return require("@/assets/images/navbar/user.png");
+            // 未登录时使用本地默认头像
+            return require("@/assets/images/avatar/user.png");
         },
         isLoggedIn() {
             const token = this.$store.state.token;
@@ -118,12 +125,17 @@ export default {
         
         // 启动定时检查token有效性
         this.startTokenCheck();
+        
+        // 监听用户中心的头像更新事件
+        this.$root.$on('refreshNavbarAvatar', this.refreshAvatar);
     },
     beforeDestroy() {
         // 组件销毁时清除定时器
         if (this.tokenCheckTimer) {
             clearInterval(this.tokenCheckTimer);
         }
+        // 移除事件监听
+        this.$root.$off('refreshNavbarAvatar', this.refreshAvatar);
     },
     methods: {
         // 检查token是否过期
@@ -200,6 +212,23 @@ export default {
                 this.logout();
             } else if (cmd === 'login') {
                 this.$router.push('/login');
+            }
+        },
+        async refreshAvatar() {
+            // 重新获取用户信息以更新头像
+            const token = this.$store.state.token;
+            if (token && !this.isTokenExpired(token)) {
+                try {
+                    const res = await getUserInfo(token);
+                    if (res.data.code === 200) {
+                        // 更新头像名称
+                        this.avatarName = res.data.data.avatar;
+                        // 更新时间戳，强制 computed 重新计算
+                        this.avatarTimestamp = Date.now();
+                    }
+                } catch (e) {
+                    console.error('刷新头像失败:', e);
+                }
             }
         }
     },

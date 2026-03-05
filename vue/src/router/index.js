@@ -13,6 +13,7 @@ import About from "@/views/system/home/subpages/about/index.vue";
 import Team from "@/views/system/home/subpages/team/index.vue";
 import Sponsor from "@/views/system/home/subpages/sponsor/index.vue";
 import Notice from "@/views/system/home/subpages/notice/index.vue";
+import NotFound from "@/views/error/404.vue";
 
 Vue.use(VueRouter);
 
@@ -132,6 +133,15 @@ const routes = [
         component: Notice,
         meta: {
             title: "注意事项",
+            requiresAuth: false,
+        },
+    },
+    {
+        path: "*",
+        name: "NotFound",
+        component: NotFound,
+        meta: {
+            title: "页面未找到",
             requiresAuth: false,
         },
     },

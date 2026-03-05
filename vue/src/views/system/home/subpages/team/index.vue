@@ -21,7 +21,7 @@
                     <div class="team-grid" v-if="developers.length > 0">
                         <div class="team-member" v-for="member in developers" :key="member.id">
                             <div class="member-avatar">
-                                <img :src="member.avatar" :alt="member.name" />
+                                <img :src="getDisplayAvatarUrl(member.avatar)" :alt="member.name" />
                             </div>
                             <div class="member-info">
                                 <h3 class="member-name">{{ member.name }}</h3>
@@ -44,7 +44,7 @@
                     <div class="team-grid" v-if="managers.length > 0">
                         <div class="team-member" v-for="member in managers" :key="member.id">
                             <div class="member-avatar">
-                                <img :src="member.avatar" :alt="member.name" />
+                                <img :src="getDisplayAvatarUrl(member.avatar)" :alt="member.name" />
                             </div>
                             <div class="member-info">
                                 <h3 class="member-name">{{ member.name }}</h3>
@@ -67,7 +67,7 @@
                         <p>我们正在寻找优秀的开发者和管理者加入团队。如果你对知识共享、开源项目或技术创新充满热情，欢迎联系我们！</p>
                         <div class="contact-info">
                             <p><strong>联系方式：</strong></p>
-                            <p>QQ：3011499075</p>
+                            <p>Telegram群：<a href="https://t.me/kscn_top" target="_blank">KSCN</a></p>
                             <p>邮箱：lab_c919@qq.com</p>
                         </div>
                     </div>
@@ -129,7 +129,7 @@ export default {
                     name: member.user?.nickname || member.user?.username || '未知用户',
                     role: member.role,
                     description: member.description || '暂无描述',
-                    avatar: this.getUserAvatarUrl(member.user),
+                    avatar: member.user, // 传递整个 user 对象给 getDisplayAvatarUrl
                     skills: member.skills || []
                 };
                 
@@ -143,9 +143,11 @@ export default {
             });
         },
         
-
-        
-        getUserAvatarUrl
+        getDisplayAvatarUrl(user) {
+            const url = getUserAvatarUrl(user);
+            // 如果返回 null，使用本地默认头像
+            return url || require("@/assets/images/avatar/user.png");
+        }
     },
 };
 </script>
@@ -177,6 +179,25 @@ export default {
 .contact-info { background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #e9ecef; }
 .contact-info p { margin-bottom: 8px; color: #495057; }
 .contact-info p:last-child { margin-bottom: 0; }
+.contact-info a {
+    color: #0088cc;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+.contact-info a:hover {
+    color: #006699;
+    background: rgba(0, 136, 204, 0.1);
+}
+.contact-info a::before {
+    content: '✈️';
+    margin-right: 4px;
+    font-size: 14px;
+}
 .loading-container { display: flex; justify-content: center; align-items: center; min-height: 300px; }
 .no-data { text-align: center; padding: 40px; color: #6c757d; font-size: 16px; }
 @media (max-width: 768px) { .team-body { width: 95%; padding: 20px 0; } .team-header h1 { font-size: 36px; } .subtitle { font-size: 18px; } .team-content { padding: 24px; } .team-section h2 { font-size: 28px; margin-bottom: 24px; } .team-grid { grid-template-columns: 1fr; gap: 20px; } .team-member { padding: 20px; } .member-avatar img { width: 100px; height: 100px; } .member-name { font-size: 20px; } .join-us { padding: 24px; } }

@@ -7,13 +7,18 @@
         
         <!-- 无权限提示 -->
         <div v-else-if="!hasPermission" class="no-permission">
-            <div class="permission-error">
-                <i class="el-icon-warning"></i>
-                <h2>访问被拒绝</h2>
-                <p>您没有权限访问管理页面</p>
-                <p>只有管理员才能访问此页面</p>
-                <el-button type="primary" @click="goBack">返回上一页</el-button>
-            </div>
+            <el-empty description="访问被拒绝">
+                <template #image>
+                    <i class="el-icon-lock" style="font-size: 100px; color: #f56c6c"></i>
+                </template>
+                <p class="error-code">403 - Forbidden</p>
+                <p class="error-message">您没有权限访问管理页面</p>
+                <p class="error-message">只有管理员才能访问此页面</p>
+                <el-button-group>
+                    <el-button type="primary" icon="el-icon-back" @click="goBack">返回</el-button>
+                    <el-button icon="el-icon-house" @click="goHome">首页</el-button>
+                </el-button-group>
+            </el-empty>
         </div>
         
         <!-- 管理页面内容 -->
@@ -137,14 +142,10 @@ export default {
             }
         },
         goBack() {
-            // 返回到来源页面或首页
-            if (this.$route.query.from) {
-                this.$router.push(this.$route.query.from);
-            } else if (window.history.length > 1) {
-                this.$router.go(-1);
-            } else {
-                this.$router.push('/');
-            }
+            this.$router.go(-1);
+        },
+        goHome() {
+            this.$router.push('/');
         },
         switchMenu(menu) {
             this.currentMenu = menu;
@@ -181,42 +182,16 @@ export default {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f5f5f5;
 }
 
-.permission-error {
-    text-align: center;
-    background: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    width: 90%;
-}
-
-.permission-error i {
-    font-size: 64px;
-    color: #f56c6c;
-    margin-bottom: 20px;
-}
-
-.permission-error h2 {
-    color: #303133;
-    margin: 0 0 15px 0;
+.error-code {
     font-size: 24px;
-}
-
-.permission-error p {
-    color: #606266;
     margin: 10px 0;
-    font-size: 16px;
-    line-height: 1.5;
 }
 
-.permission-error .el-button {
-    margin-top: 20px;
-    padding: 12px 30px;
-    font-size: 16px;
+.error-message {
+    color: #909399;
+    margin-bottom: 20px;
 }
 
 .admin-layout {

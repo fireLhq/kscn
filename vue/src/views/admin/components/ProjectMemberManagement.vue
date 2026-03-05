@@ -49,7 +49,7 @@
                     <template slot-scope="scope">
                         <div class="user-info">
                             <div class="user-avatar">
-                                <img :src="getUserAvatarUrl(scope.row.user)" :alt="scope.row.user?.nickname" />
+                                <img :src="getDisplayAvatarUrl(scope.row.user)" :alt="scope.row.user?.nickname" />
                             </div>
                             <div class="user-details">
                                 <div class="user-name">{{ scope.row.user?.nickname || scope.row.user?.username || '-' }}</div>
@@ -145,7 +145,7 @@
                             :value="user.userId"
                         >
                             <div class="user-option">
-                                <img :src="getUserAvatarUrl(user)" class="option-avatar" />
+                                <img :src="getDisplayAvatarUrl(user)" class="option-avatar" />
                                 <span>{{ user.nickname || user.username }}</span>
                                 <span class="option-email">({{ user.email }})</span>
                             </div>
@@ -461,7 +461,11 @@ export default {
             };
             this.$refs.memberForm && this.$refs.memberForm.resetFields();
         },
-        getUserAvatarUrl
+        getDisplayAvatarUrl(user) {
+            const url = getUserAvatarUrl(user);
+            // 如果返回 null，使用本地默认头像
+            return url || require("@/assets/images/avatar/user.png");
+        }
     }
 };
 </script>

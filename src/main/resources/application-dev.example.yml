@@ -19,9 +19,6 @@ spring:
       port: 6379 # Redis服务器端口
       password:
       database: 0 # Redis数据库索引
-  web:
-    resources:
-      static-locations: file:I:/kscn/data/resources # 公共静态资源路径
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml # MyBatis映射文件位置
@@ -35,4 +32,4 @@ aliyun:
     access-key-secret: REPLACE_ME # 阿里云AccessKey Secret
 
 file:
-  root-path: I:/kscn/data/resources/api/public
+  storage-root: D:/kscn-storage  # 云盘统一存储根目录（包含avatar/、storage/、temp/）

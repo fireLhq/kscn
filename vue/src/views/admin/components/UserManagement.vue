@@ -67,7 +67,7 @@
                 <el-table-column label="头像" width="80" align="center">
                     <template slot-scope="scope">
                         <div class="user-avatar">
-                            <img :src="getUserAvatarUrl(scope.row)" :alt="scope.row.nickname || scope.row.username" />
+                            <img :src="getDisplayAvatarUrl(scope.row)" :alt="scope.row.nickname || scope.row.username" />
                         </div>
                     </template>
                 </el-table-column>
@@ -505,7 +505,11 @@ export default {
             };
             this.$refs.userForm && this.$refs.userForm.resetFields();
         },
-        getUserAvatarUrl
+        getDisplayAvatarUrl(user) {
+            const url = getUserAvatarUrl(user);
+            // 如果返回 null，使用本地默认头像
+            return url || require("@/assets/images/avatar/user.png");
+        }
     }
 };
 </script>
