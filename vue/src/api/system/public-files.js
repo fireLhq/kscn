@@ -1,9 +1,6 @@
-import axios from "axios";
+import { createApiClient } from "@/utils/request";
 
-const service = axios.create({
-    baseURL: "/api/public-files",
-    timeout: 300000, // 5分钟
-});
+const service = createApiClient("/api/public-files", 300000);
 
 // ==================== 文件上传 ====================
 
@@ -218,6 +215,10 @@ export function listAllFiles(token = null) {
         };
     }
     return service.get("/list/all", config);
+}
+
+export function getPublicResourceFileCount() {
+    return service.get("/count");
 }
 
 /**

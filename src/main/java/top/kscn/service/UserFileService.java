@@ -192,6 +192,20 @@ public interface UserFileService {
      * @return 是否足够
      */
     boolean checkUserSpace(Long userId, Long fileSize);
+
+    /**
+     * 获取用户文件数量（不包含文件夹和已删除）
+     * @param userId 用户ID
+     * @return 文件数量
+     */
+    Long getUserFileCount(Long userId);
+
+    /**
+     * 重新计算并持久化用户已用空间
+     * @param userId 用户ID
+     * @return 重新计算后的已用空间
+     */
+    Long recalculateUsedSpace(Long userId);
     
     // ==================== 回收站 ====================
     

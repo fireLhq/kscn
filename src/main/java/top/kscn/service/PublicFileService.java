@@ -201,4 +201,6 @@ public interface PublicFileService {
      * @return 统计信息
      */
     Map<String, Object> getStatistics();
+
+    long countPublicResourceFiles();
 }

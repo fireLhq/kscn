@@ -8,20 +8,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Result<T> {
-    private int code;
-    private String message;
-    private T data;
+    private int code; // 响应码
+    private String message; // 响应消息
+    private T data; // 响应数据
 
     public static <T> Result<T> success(String message, T data) {
         return new Result<>(200, message, data);
-    }
-
-    public static Result<?> success(String message) {
-        return new Result<>(200, message, null);
-    }
-
-    public static Result<?> error(String message) {
-        return new Result<>(500, message, null);
     }
 
     public static Result<?> error(int code, String message) {

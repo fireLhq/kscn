@@ -1,22 +1,23 @@
 <template>
     <div class="recover">
-        <div class="container">
             <el-form ref="recoverForm" :model="recoverForm" :rules="recoverRules" class="recover-form">
                 <h2 class="title">找回密码</h2>
-                <div class="user">
-                    <img src="@/assets/images/recover/password.png" alt="password" />
+                <div class="icon">
+                <img src="@/assets/images/system/auth/recover/icon.svg" alt="icon" />
                 </div>
 
                 <el-form-item prop="email">
                     <el-input v-model="recoverForm.email" type="email" placeholder="请输入注册邮箱" prefix-icon="el-icon-message" />
                 </el-form-item>
 
-                <el-form-item prop="code">
-                    <el-input v-model="recoverForm.code" type="text" placeholder="验证码" prefix-icon="el-icon-s-operation" style="width: 63%" />
+            <div class="code-form-item">
+                <el-form-item prop="code" class="code-input-wrapper">
+                    <el-input v-model="recoverForm.code" type="text" placeholder="验证码" prefix-icon="el-icon-s-operation" class="code-input" />
+                </el-form-item>
                     <el-button @click.prevent="sendCode" class="code-btn" :disabled="remainingTime > 0">
                         {{ buttonText }}
                     </el-button>
-                </el-form-item>
+            </div>
 
                 <el-form-item prop="newPassword">
                     <el-input v-model="recoverForm.newPassword" type="password" placeholder="新密码" prefix-icon="el-icon-lock" show-password />
@@ -35,12 +36,11 @@
                     <router-link to="/register">注册新账号</router-link>
                 </div>
             </el-form>
-        </div>
     </div>
 </template>
 
 <script>
-import { sendPasswordResetCode, resetPassword } from "@/api/system/user";
+import { postAuthPasswordCode, putAuthPassword } from "@/api/system/auth";
 
 export default {
     name: "Recover",
@@ -80,8 +80,28 @@ export default {
             },
             loading: false,
             remainingTime: 0,
-            buttonText: "发送验证码"
+            timer: null,
         };
+    },
+    computed: {
+        buttonText() {
+            return this.remainingTime > 0 ? `${this.remainingTime}s` : "发送验证码";
+        },
+    },
+    created() {
+        const savedEndTime = localStorage.getItem("recoverCountdownEnd");
+        if (savedEndTime) {
+            const remaining = Math.ceil((savedEndTime - Date.now()) / 1000);
+            if (remaining > 0) {
+                this.remainingTime = remaining;
+                this.startTimer();
+            } else {
+                localStorage.removeItem("recoverCountdownEnd");
+            }
+        }
+    },
+    beforeDestroy() {
+        clearInterval(this.timer);
     },
     methods: {
         async sendCode() {
@@ -91,27 +111,27 @@ export default {
             }
 
             try {
-                const response = await sendPasswordResetCode(this.recoverForm.email);
-                if (response.data.code === 200) {
+                const response = await postAuthPasswordCode({ email: this.recoverForm.email });
                     this.$message.success(response.data.message || "验证码已发送到您的邮箱");
                     this.startCountdown();
-                } else {
-                    this.$message.error(response.data.message || "发送验证码失败");
-                }
             } catch (error) {
                 const errorMessage = error.response?.data?.message || "发送验证码失败，请重试";
                 this.$message.error(errorMessage);
             }
         },
         startCountdown() {
+            if (this.remainingTime > 0) return;
             this.remainingTime = 60;
-            this.buttonText = `${this.remainingTime}s`;
-            const timer = setInterval(() => {
+            localStorage.setItem("recoverCountdownEnd", Date.now() + 60000);
+            this.startTimer();
+        },
+        startTimer() {
+            clearInterval(this.timer);
+            this.timer = setInterval(() => {
                 this.remainingTime--;
-                this.buttonText = `${this.remainingTime}s`;
                 if (this.remainingTime <= 0) {
-                    clearInterval(timer);
-                    this.buttonText = "发送验证码";
+                    clearInterval(this.timer);
+                    localStorage.removeItem("recoverCountdownEnd");
                 }
             }, 1000);
         },
@@ -120,17 +140,13 @@ export default {
                 if (valid) {
                     this.loading = true;
                     try {
-                        const response = await resetPassword(
-                            this.recoverForm.email,
-                            this.recoverForm.code,
-                            this.recoverForm.newPassword
-                        );
-                        if (response.data.code === 200) {
+                        const response = await putAuthPassword({
+                            email: this.recoverForm.email,
+                            code: this.recoverForm.code,
+                            newPassword: this.recoverForm.newPassword,
+                        });
                             this.$message.success(response.data.message || "密码重置成功，请使用新密码登录");
                             this.$router.push("/login");
-                        } else {
-                            this.$message.error(response.data.message || "密码重置失败");
-                        }
                     } catch (error) {
                         const errorMessage = error.response?.data?.message || "密码重置失败，请重试";
                         this.$message.error(errorMessage);
@@ -151,9 +167,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: url("@/assets/images/recover/background.jpg") no-repeat center/cover;
-    background-size: cover;
-    background-position: center;
+    background: url("@/assets/images/system/auth/recover/background.jpg") no-repeat center/cover;
 }
 
 .title {
@@ -165,15 +179,6 @@ export default {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.container {
-    text-align: center;
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
 .recover-form {
     background: rgba(0, 0, 0, 0.6);
     padding: 24px 30px 30px;
@@ -182,28 +187,53 @@ export default {
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
 }
 
-.user { margin-bottom: 18px; }
-.user img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3); }
+.icon { margin-bottom: 18px; }
+.icon img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3); }
 
 ::v-deep .el-form-item { margin-bottom: 16px; }
 ::v-deep .el-input__inner { background-color: rgba(255,255,255,0.15) !important; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff !important; height: 45px; border-radius: 8px; font-size: 14px; }
 ::v-deep .el-input__inner::placeholder { color: rgba(255,255,255,0.7) !important; }
 ::v-deep .el-input__prefix { color: rgba(255,255,255,0.8) !important; }
 
-.code-btn { 
-    width: 35%; 
+.code-form-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+::v-deep .code-input-wrapper {
+    flex: 1;
+    margin-bottom: 0 !important;
+}
+
+::v-deep .code-input-wrapper .el-form-item__content {
+    display: block;
+}
+
+.code-input {
+    width: 100%;
+}
+
+::v-deep .code-btn {
+    width: 100px;
     height: 45px; 
-    background: rgba(255,255,255,0.2); 
+    background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255,255,255,0.3); 
     color: #fff; 
     border-radius: 8px; 
-    font-size: 14px; 
+    font-size: 12px;
     transition: all 0.3s ease; 
+    padding: 0;
+    flex-shrink: 0;
 }
-.code-btn:hover { background: rgba(255,255,255,0.3); }
-.code-btn:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
+
+.code-btn:hover { background: rgba(255, 255, 255, 0.3); }
+
+.code-btn:disabled { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); }
 
 .recover-btn { width: 100%; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; font-size: 16px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
 .recover-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
@@ -216,6 +246,7 @@ export default {
 @media (max-width: 480px) {
     .recover-form { width: 90%; padding: 20px; }
     .title { font-size: 20px; }
-    .user img { width: 60px; height: 60px; }
+    .icon img { width: 60px; height: 60px; }
+    .code-btn { width: 80px; font-size: 11px; }
 }
 </style>

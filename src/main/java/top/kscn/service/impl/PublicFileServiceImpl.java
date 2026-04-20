@@ -534,6 +534,11 @@ public class PublicFileServiceImpl implements PublicFileService {
         return stats;
     }
 
+    @Override
+    public long countPublicResourceFiles() {
+        return publicFileMapper.countFiles();
+    }
+
     // ==================== 私有方法 ====================
 
     /**

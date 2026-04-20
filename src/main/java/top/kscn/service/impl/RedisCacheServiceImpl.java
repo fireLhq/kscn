@@ -12,7 +12,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RedisCacheServiceImpl implements RedisCacheService {
 
-    private static final String TEMP_USER_PREFIX = "temp:user:";
+    private static final String REGISTER_PREFIX = "register:";
+    private static final String EMAIL_CODE_PREFIX = "email:code:";
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -29,52 +30,31 @@ public class RedisCacheServiceImpl implements RedisCacheService {
         Map<String, String> tempUser = new HashMap<>();
         tempUser.put("password", password);
         tempUser.put("code", code);
-        redisTemplate.opsForValue().set(
-                TEMP_USER_PREFIX + email,
-                tempUser,
-                5,
-                TimeUnit.MINUTES
-        );
+        redisTemplate.opsForValue().set(REGISTER_PREFIX + email, tempUser, 5, TimeUnit.MINUTES);
     }
 
     @Override
     public void saveEmailCode(String email, String code) {
-        redisTemplate.opsForValue().set(
-                TEMP_USER_PREFIX + email,
-                code,
-                5,
-                TimeUnit.MINUTES
-        );
+        redisTemplate.opsForValue().set(EMAIL_CODE_PREFIX + email, code, 5, TimeUnit.MINUTES);
     }
 
-    /**
-     * 获取临时用户信息
-     *
-     * @param email 邮箱
-     * @return 临时用户信息
-     */
     @Override
     public Map<String, String> getTempUser(String email) {
-        return (Map<String, String>) redisTemplate.opsForValue().get(TEMP_USER_PREFIX + email);
+        return (Map<String, String>) redisTemplate.opsForValue().get(REGISTER_PREFIX + email);
     }
 
     @Override
     public String getEmailCode(String email) {
-        return (String) redisTemplate.opsForValue().get(TEMP_USER_PREFIX + email);
+        return (String) redisTemplate.opsForValue().get(EMAIL_CODE_PREFIX + email);
     }
 
-    /**
-     * 移除临时用户信息
-     *
-     * @param email 邮箱
-     */
     @Override
     public void removeTempUser(String email) {
-        redisTemplate.delete(TEMP_USER_PREFIX + email);
+        redisTemplate.delete(REGISTER_PREFIX + email);
     }
 
     @Override
     public void removeEmailCode(String email) {
-        redisTemplate.delete(TEMP_USER_PREFIX + email);
+        redisTemplate.delete(EMAIL_CODE_PREFIX + email);
     }
 }

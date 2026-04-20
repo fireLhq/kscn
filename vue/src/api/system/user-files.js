@@ -1,9 +1,6 @@
-import axios from "axios";
+import { createApiClient } from "@/utils/request";
 
-const service = axios.create({
-    baseURL: "/api/user-files",
-    timeout: 300000, // 5分钟
-});
+const service = createApiClient("/api/user-files", 300000);
 
 // ==================== 文件上传 ====================
 
@@ -369,6 +366,19 @@ export function getUserSpaceInfo(token = null) {
     return service.get("/space", config);
 }
 
+/**
+ * 获取用户文件数量
+ */
+export function getUserFileCount(token = null) {
+    const config = {};
+    if (token) {
+        config.headers = {
+            Authorization: `Bearer ${token}`,
+        };
+    }
+    return service.get("/count", config);
+}
+
 // ==================== 回收站 ====================
 
 /**
@@ -435,6 +445,7 @@ export default {
     createBatchDownloadTask,
     downloadBatchTask,
     getUserSpaceInfo,
+    getUserFileCount,
     getRecycleBin,
     restoreFile,
     emptyRecycleBin

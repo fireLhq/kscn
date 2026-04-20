@@ -647,25 +647,31 @@ public class UserFileServiceImpl implements UserFileService {
             throw new CustomException(404, "用户不存在");
         }
 
-        // 自动纠正空间使用量（无感知纠正）
-        Long actualUsedSpace = userFileMapper.calculateUserTotalFileSize(userId);
-        if (actualUsedSpace == null) {
-            actualUsedSpace = 0L;
-        }
-        
-        // 如果数据库中的已用空间与实际计算不一致，自动纠正
-        if (!actualUsedSpace.equals(user.getUsedSpace())) {
-            userMapper.updateUsedSpace(userId, actualUsedSpace);
-            user.setUsedSpace(actualUsedSpace);
-        }
+        Long usedSpace = user.getUsedSpace() == null ? 0L : user.getUsedSpace();
+        Long totalSpace = user.getTotalSpace() == null ? 0L : user.getTotalSpace();
 
         Map<String, Object> spaceInfo = new HashMap<>();
-        spaceInfo.put("totalSpace", user.getTotalSpace());
-        spaceInfo.put("usedSpace", actualUsedSpace);
-        spaceInfo.put("availableSpace", user.getTotalSpace() - actualUsedSpace);
-        spaceInfo.put("usagePercentage", (double) actualUsedSpace / user.getTotalSpace() * 100);
+        spaceInfo.put("totalSpace", totalSpace);
+        spaceInfo.put("usedSpace", usedSpace);
+        spaceInfo.put("availableSpace", Math.max(totalSpace - usedSpace, 0L));
+        spaceInfo.put("usagePercentage", totalSpace <= 0 ? 0D : (double) usedSpace / totalSpace * 100);
 
         return spaceInfo;
+    }
+
+    @Override
+    public Long getUserFileCount(Long userId) {
+        Long fileCount = userFileMapper.countUserFiles(userId);
+        return fileCount == null ? 0L : fileCount;
+    }
+
+    @Override
+    public Long recalculateUsedSpace(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new CustomException(404, "用户不存在");
+        }
+        return recalculateAndPersistUserSpaceUsage(userId);
     }
 
     @Override
@@ -674,20 +680,10 @@ public class UserFileServiceImpl implements UserFileService {
         if (user == null) {
             return false;
         }
-        
-        // 自动纠正空间使用量（无感知纠正）
-        Long actualUsedSpace = userFileMapper.calculateUserTotalFileSize(userId);
-        if (actualUsedSpace == null) {
-            actualUsedSpace = 0L;
-        }
-        
-        // 如果数据库中的已用空间与实际计算不一致，自动纠正
-        if (!actualUsedSpace.equals(user.getUsedSpace())) {
-            userMapper.updateUsedSpace(userId, actualUsedSpace);
-            user.setUsedSpace(actualUsedSpace);
-        }
-        
-        return user.getUsedSpace() + fileSize <= user.getTotalSpace();
+
+        Long actualUsedSpace = recalculateAndPersistUserSpaceUsage(userId);
+        Long totalSpace = user.getTotalSpace() == null ? 0L : user.getTotalSpace();
+        return actualUsedSpace + fileSize <= totalSpace;
     }
 
     // ==================== 回收站 ====================
@@ -711,6 +707,7 @@ public class UserFileServiceImpl implements UserFileService {
         }
 
         userFileMapper.restore(fileId);
+        updateUserSpaceUsage(userId);
     }
 
     @Override
@@ -837,19 +834,21 @@ public class UserFileServiceImpl implements UserFileService {
     }
     
     /**
-     * 更新用户空间使用量（重新计算）
-     * 通过统计用户所有文件（包括回收站）的大小总和来更新已用空间
-     * 注意：统计的是数据库记录的大小总和，不是物理文件大小
+     * 更新用户空间使用量（重新计算后直接覆盖）
+     * 仅在用户执行文件相关操作时调用，正常读取不修改数据库值
      */
     private void updateUserSpaceUsage(Long userId) {
-        // 计算用户所有文件（包括回收站）的总大小
+        recalculateAndPersistUserSpaceUsage(userId);
+    }
+
+    private Long recalculateAndPersistUserSpaceUsage(Long userId) {
         Long totalUsedSpace = userFileMapper.calculateUserTotalFileSize(userId);
         if (totalUsedSpace == null) {
             totalUsedSpace = 0L;
         }
-        
-        // 更新用户已用空间
-        userMapper.updateUsedSpace(userId, totalUsedSpace);
+
+        userMapper.setUsedSpace(userId, totalUsedSpace);
+        return totalUsedSpace;
     }
 
     /**

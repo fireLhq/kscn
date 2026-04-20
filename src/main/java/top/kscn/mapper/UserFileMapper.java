@@ -104,5 +104,10 @@ public interface UserFileMapper {
      */
     @Select("SELECT COALESCE(SUM(file_size), 0) FROM user_file WHERE user_id = #{userId} AND is_folder = 0")
     Long calculateUserTotalFileSize(@Param("userId") Long userId);
-}
 
+    /**
+     * 获取用户文件数量（不包含文件夹和已删除）
+     */
+    @Select("SELECT COUNT(1) FROM user_file WHERE user_id = #{userId} AND is_folder = 0 AND is_deleted = 0")
+    Long countUserFiles(@Param("userId") Long userId);
+}

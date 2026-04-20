@@ -10,12 +10,10 @@
             </div>
             
             <div class="team-content">
-                <!-- 加载状态 -->
                 <div v-if="loading" class="loading-container">
                     <el-loading :loading="true" text="加载团队成员中..."></el-loading>
                 </div>
                 
-                <!-- 开发团队 -->
                 <div v-else class="team-section">
                     <h2>开发团队</h2>
                     <div class="team-grid" v-if="developers.length > 0">
@@ -25,11 +23,11 @@
                             </div>
                             <div class="member-info">
                                 <h3 class="member-name">{{ member.name }}</h3>
-                                <p class="member-role">{{ member.role }}</p>
-                                <p class="member-description">{{ member.description }}</p>
-                                <div class="member-skills">
-                                    <span class="skill-tag" v-for="skill in member.skills" :key="skill">{{ skill }}</span>
-                                </div>
+                                <p class="member-role">{{ member.roleName }}</p>
+                                <p class="member-description">{{ member.intro || '暂无描述' }}</p>
+                                <p v-if="member.website" class="member-website">
+                                    <a :href="member.website" target="_blank" rel="noopener noreferrer">个人主页</a>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -38,7 +36,6 @@
                     </div>
                 </div>
                 
-                <!-- 管理团队 -->
                 <div v-if="!loading" class="team-section">
                     <h2>管理团队</h2>
                     <div class="team-grid" v-if="managers.length > 0">
@@ -48,11 +45,11 @@
                             </div>
                             <div class="member-info">
                                 <h3 class="member-name">{{ member.name }}</h3>
-                                <p class="member-role">{{ member.role }}</p>
-                                <p class="member-description">{{ member.description }}</p>
-                                <div class="member-skills">
-                                    <span class="skill-tag" v-for="skill in member.skills" :key="skill">{{ skill }}</span>
-                                </div>
+                                <p class="member-role">{{ member.roleName }}</p>
+                                <p class="member-description">{{ member.intro || '暂无描述' }}</p>
+                                <p v-if="member.website" class="member-website">
+                                    <a :href="member.website" target="_blank" rel="noopener noreferrer">个人主页</a>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -78,8 +75,7 @@
 </template>
 
 <script>
-import { getProjectMemberList } from "@/api/system/projectMember";
-import { getUserAvatarUrl } from "@/utils/avatarUtils";
+import { getMemberPage, getMemberAvatarUrl } from "@/api/system/member";
 
 export default {
     name: "TeamView",
@@ -92,61 +88,47 @@ export default {
         };
     },
     async mounted() {
-        await this.loadProjectMembers();
+        await this.loadMembers();
     },
     methods: {
-        async loadProjectMembers() {
+        async loadMembers() {
             this.loading = true;
             this.error = false;
             try {
-                // 无论是否登录都可以获取项目成员列表
-                const token = this.$store.state.token || null;
-                const response = await getProjectMemberList(token, { page: 1, size: 100 });
+                const response = await getMemberPage({ page: 1, size: 100 });
                 if (response.data.code === 200) {
                     const members = response.data.data.records || response.data.data || [];
                     this.processMembers(members);
                 } else {
-                    console.warn('获取项目成员失败');
                     this.developers = [];
                     this.managers = [];
                 }
             } catch (error) {
-                console.error('获取项目成员失败:', error);
+                console.error("获取项目成员失败:", error);
                 this.developers = [];
                 this.managers = [];
             } finally {
                 this.loading = false;
             }
         },
-        
         processMembers(members) {
             this.developers = [];
             this.managers = [];
-            
-            members.forEach(member => {
-                const memberData = {
-                    id: member.memberId,
-                    name: member.user?.nickname || member.user?.username || '未知用户',
-                    role: member.role,
-                    description: member.description || '暂无描述',
-                    avatar: member.user, // 传递整个 user 对象给 getDisplayAvatarUrl
-                    skills: member.skills || []
-                };
-                
-                if (member.type === 0) {
-                    // 开发人员
-                    this.developers.push(memberData);
-                } else if (member.type === 1) {
-                    // 管理人员
-                    this.managers.push(memberData);
+
+            members.forEach((member) => {
+                if (member.memberType === 2) {
+                    this.developers.push(member);
+                } else if (member.memberType === 1) {
+                    this.managers.push(member);
                 }
             });
         },
-        
-        getDisplayAvatarUrl(user) {
-            const url = getUserAvatarUrl(user);
-            // 如果返回 null，使用本地默认头像
-            return url || require("@/assets/images/avatar/user.png");
+        getDisplayAvatarUrl(avatar) {
+            if (!avatar) {
+                return require("@/assets/images/components/avatar/user.png");
+            }
+            const url = getMemberAvatarUrl(avatar);
+            return url || require("@/assets/images/components/avatar/user.png");
         }
     },
 };
@@ -167,13 +149,12 @@ export default {
 .team-member { background: #f8f9fa; border-radius: 12px; padding: 24px; border: 1px solid #e9ecef; transition: all 0.3s ease; }
 .team-member:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
 .member-avatar { text-align: center; margin-bottom: 20px; }
-.member-avatar img { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+.member-avatar img { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); object-fit: cover; }
 .member-info { text-align: center; }
 .member-name { font-size: 24px; color: #212529; margin-bottom: 8px; font-weight: 600; }
 .member-role { font-size: 16px; color: #6c757d; margin-bottom: 16px; font-weight: 500; }
-.member-description { font-size: 14px; color: #495057; line-height: 1.6; margin-bottom: 20px; text-align: left; }
-.member-skills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-.skill-tag { background: #6c757d; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+.member-description { font-size: 14px; color: #495057; line-height: 1.6; margin-bottom: 12px; text-align: left; }
+.member-website a { color: #0088cc; text-decoration: none; }
 .join-us { background: #f8f9fa; padding: 32px; border-radius: 8px; border: 1px solid #e9ecef; }
 .join-us p { font-size: 16px; color: #495057; line-height: 1.8; margin-bottom: 24px; }
 .contact-info { background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #e9ecef; }

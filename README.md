@@ -1,16 +1,16 @@
-# KSCN - 知识共享与协作网络
+# KSCN - 知识共享协作网络
 
 <div align="center">
 
-![KSCN Logo](vue/src/assets/images/navbar/logo.svg)
+![KSCN Logo](vue/src/assets/images/components/navbar/logo.svg)
 
-**Knowledge Sharing and Collaboration Network**
+**Knowledge Sharing Collaboration Network**
 
-一个致力于知识共享与协作的开源项目
+一个致力于知识共享协作的开源项目
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Vue](https://img.shields.io/badge/Vue-2.x-brightgreen.svg)](https://vuejs.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.x-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
 [在线演示](https://kscn.top) | [问题反馈](https://github.com/fireLhq/kscn/issues) | [Telegram群](https://t.me/kscn_top)
 
@@ -20,7 +20,7 @@
 
 ## 📖 项目简介
 
-KSCN（Knowledge Sharing and Collaboration Network）是一个现代化的知识共享与协作平台，提供文件管理、云盘存储、在线服务等功能。我们相信知识的力量，希望通过技术手段构建一个开放、包容、高效的知识共享平台。
+KSCN（Knowledge Sharing Collaboration Network）是一个现代化的知识共享协作平台，提供文件管理、云盘存储、在线服务等功能。我们相信知识的力量，希望通过技术手段构建一个开放、包容、高效的知识共享平台。
 
 ### ✨ 核心特性
 
@@ -35,39 +35,62 @@ KSCN（Knowledge Sharing and Collaboration Network）是一个现代化的知识
 
 ## 🏗️ 项目结构
 
-```
+```text
 kscn/
-├── src/                    # Spring Boot 后端
+├── src/                          # Spring Boot 后端
 │   ├── main/
-│   │   ├── java/          # Java源代码
-│   │   │   └── com/kscn/
-│   │   │       ├── controller/    # 控制器层
-│   │   │       ├── service/       # 服务层
-│   │   │       ├── mapper/        # 数据访问层
-│   │   │       ├── entity/        # 实体类
-│   │   │       ├── config/        # 配置类
-│   │   │       └── utils/         # 工具类
-│   │   └── resources/     # 资源文件
-│   │       ├── mapper/            # MyBatis映射文件
-│   │       ├── application.yml    # 主配置文件
-│   │       ├── application-dev.yml    # 开发环境配置
-│   │       └── application-prod.yml   # 生产环境配置
-│   └── test/              # 测试代码
-├── vue/                   # Vue.js 前端
-│   ├── public/           # 静态资源
+│   │   ├── java/
+│   │   │   └── top/kscn/
+│   │   │       ├── common/       # 通用返回结构
+│   │   │       ├── config/       # 配置类
+│   │   │       ├── controller/   # 控制器层
+│   │   │       ├── entity/       # 实体类与 DTO
+│   │   │       ├── exception/    # 异常处理
+│   │   │       ├── filter/       # 过滤器
+│   │   │       ├── handler/      # 处理器
+│   │   │       ├── mapper/       # 数据访问层
+│   │   │       ├── security/     # 安全认证
+│   │   │       ├── service/      # 服务层及实现
+│   │   │       ├── utils/        # 工具类
+│   │   │       └── KscnApplication.java
+│   │   └── resources/            # 资源文件
+│   │       ├── mapper/           # MyBatis 映射文件
+│   │       ├── application.yml   # 主配置文件
+│   │       ├── application-dev.example.yml
+│   │       ├── application-prod.example.yml
+│   │       └── banner.txt
+│   └── test/                     # 测试代码
+├── vue/                          # Vue.js 前端
+│   ├── public/                   # 静态资源
 │   ├── src/
-│   │   ├── api/          # API接口
-│   │   ├── assets/       # 资源文件
-│   │   ├── components/   # 公共组件
-│   │   ├── router/       # 路由配置
-│   │   ├── store/        # Vuex状态管理
-│   │   ├── utils/        # 工具函数
-│   │   └── views/        # 页面组件
-│   ├── package.json      # 依赖配置
-│   └── vue.config.js     # Vue配置
-├── sql/                  # 数据库脚本
-├── pom.xml              # Maven配置
-└── README.md            # 项目说明
+│   │   ├── api/                  # API 接口
+│   │   │   ├── admin/            # 后台接口
+│   │   │   └── system/           # 系统接口
+│   │   ├── assets/               # 图片等资源文件
+│   │   ├── components/           # 公共组件
+│   │   ├── router/               # 路由配置
+│   │   ├── store/                # Vuex 状态管理
+│   │   ├── utils/                # 工具函数
+│   │   ├── views/                # 页面组件
+│   │   │   ├── admin/            # 后台页面
+│   │   │   ├── error/            # 错误页
+│   │   │   └── system/
+│   │   │       ├── auth/         # 登录/注册/找回密码
+│   │   │       ├── home/         # 首页及子页面
+│   │   │       ├── profile/      # 个人中心
+│   │   │       ├── public-files/ # 公共资源库
+│   │   │       ├── service/      # 服务页
+│   │   │       └── user-files/   # 个人云盘
+│   │   ├── App.vue
+│   │   └── main.js
+│   ├── package.json              # 依赖配置
+│   └── vue.config.js             # Vue 配置
+├── sql/                          # 数据库脚本
+│   ├── kscn_db.sql               # 数据库结构
+│   └── sample_data.sql           # 示例数据
+├── .gitignore
+├── pom.xml                       # Maven 配置
+└── README.md                     # 项目说明
 ```
 
 ---
@@ -76,7 +99,7 @@ kscn/
 
 ### 后端技术
 
-- **Spring Boot 2.x** - 企业级Java开发框架
+- **Spring Boot 3.5.0** - 企业级Java开发框架
 - **MyBatis-Plus** - 增强的MyBatis持久层框架
 - **MySQL** - 关系型数据库
 - **Redis** - 缓存和会话管理
@@ -107,7 +130,7 @@ kscn/
 
 ### 环境要求
 
-- **JDK 8+**
+- **JDK 17+**
 - **Node.js 14+**
 - **MySQL 5.7+**
 - **Redis 5.0+**
@@ -123,7 +146,12 @@ cd kscn
 
 2. **导入数据库**
 ```bash
-mysql -u root -p < sql/kscn.sql
+mysql -u root -p < sql/kscn_db.sql
+```
+
+如需导入示例数据，可继续执行：
+```bash
+mysql -u root -p kscn-top < sql/sample_data.sql
 ```
 
 3. **配置文件**
@@ -204,9 +232,14 @@ npm run build
 - ✅ 文件排序（名称、时间、大小）
 
 ### 后台管理
+- ✅ 数据概览面板
 - ✅ 用户管理
 - ✅ 项目成员管理
+- ✅ 系统消息管理
 - ✅ 权限控制（管理员/普通用户）
+- ✅ 用户默认头像重置
+- ✅ 用户已用空间重新计算
+- ✅ 成员头像上传
 
 ### 其他功能
 - ✅ 响应式设计（支持桌面/平板/手机）
@@ -272,7 +305,6 @@ npm run build
 - 📧 **邮箱**: lab_c919@qq.com
 - 📱 **电话**: 191-2268-5314
 - ✈️ **Telegram**: [KSCN群组](https://t.me/kscn_top)
-- 🏠 **地址**: 重庆市渝中区较场口
 - 💻 **GitHub**: [fireLhq/kscn](https://github.com/fireLhq/kscn)
 
 ---

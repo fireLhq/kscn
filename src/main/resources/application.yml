@@ -2,15 +2,25 @@ spring:
   application:
     name: kscn
   profiles:
-    active: dev  # 控制激活哪个环境，改成 prod 即可切换到生产
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   banner:
     location: banner.txt
   servlet:
     multipart:
-      max-file-size: 500MB # 单个文件最大大小
-      max-request-size: 25GB # 整个请求最大大小（多个文件总和）
+      max-file-size: 500MB
+      max-request-size: 25GB
 
 server:
   port: 8848
   servlet:
     context-path: /kscn
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+jwt:
+  expiration: 36000000
+
+cookie:
+  max-age: 36000

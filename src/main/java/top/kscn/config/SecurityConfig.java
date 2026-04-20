@@ -1,9 +1,9 @@
 package top.kscn.config;
 
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -12,63 +12,56 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import top.kscn.filter.JwtAuthenticationFilter;
-
-import java.util.List;
+import top.kscn.handler.SecurityAccessDeniedHandler;
+import top.kscn.handler.SecurityAuthEntryPoint;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter; // JWT 过滤器
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final SecurityAuthEntryPoint securityAuthEntryPoint;
+    private final SecurityAccessDeniedHandler securityAccessDeniedHandler;
 
-    // 密码加密器
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    // 配置 Spring Security
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
-                // 允许跨域
-                .cors(cors -> cors.configurationSource(request -> {
-                    var config = new org.springframework.web.cors.CorsConfiguration();
-                    config.setAllowedOriginPatterns(List.of("*")); // 允许所有源
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    config.setAllowedHeaders(List.of("*")); // 允许所有请求头
-                    config.setAllowCredentials(true); // 允许携带 Cookie
-                    return config;
-                }))
-                // 禁用 CSRF 保护
+                // 禁用CSRF
                 .csrf(csrf -> csrf.disable())
-                // 不使用 Session
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 配置权限
+
+                // 启用CORS
+                .cors(cors -> {})
+
+                // 禁用Session
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                // 认证
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/static/**", "/api/user/auth/**", "/api/projectMember/auth/**").permitAll() // 开放认证接口
-                        .requestMatchers("/api/user/regular").authenticated() // 需认证
-                        .requestMatchers("/api/user/admin/**", "/api/projectMember/admin/**").hasRole("ADMIN") // 管理员权限
-                        .anyRequest().authenticated()
+                        // 管理员专属
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // 其余在接口中处理
+                        .anyRequest().permitAll()
                 )
-                // 禁用跨站请求伪造保护
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("{\"code\":401,\"msg\":\"未登录或Token无效\"}");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.getWriter().write("{\"code\":403,\"msg\":\"权限不足\"}");
-                        })
+
+                // 异常处理
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(securityAuthEntryPoint)
+                        .accessDeniedHandler(securityAccessDeniedHandler)
                 )
-                // 添加 JWT 过滤器
+
+                // JWT过滤器
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

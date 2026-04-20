@@ -1,10 +1,9 @@
 <template>
     <div class="login">
-        <div class="container">
             <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-                <h2 class="title">登录KCN系统</h2>
-                <div class="user">
-                    <img src="@/assets/images/login/user.png" alt="user" />
+                <h2 class="title">登录KSCN系统</h2>
+                <div class="icon">
+                <img src="@/assets/images/system/auth/login/icon.svg" alt="icon" />
                 </div>
 
                 <el-form-item prop="account">
@@ -24,12 +23,11 @@
                     <router-link to="/register">点击注册</router-link>
                 </div>
             </el-form>
-        </div>
     </div>
 </template>
 
 <script>
-import { login } from "@/api/system/login";
+import { postAuthLogin } from "@/api/system/auth";
 
 export default {
     name: "Login",
@@ -66,28 +64,15 @@ export default {
                 if (valid) {
                     this.loading = true;
                     try {
-                        const response = await login(this.loginForm);
-                        if (response.data.code === 200) {
-                            // 存储token
+                        const response = await postAuthLogin(this.loginForm);
+                        // 状态码 200 即成功，直接取 data 中的 token
                             const token = response.data.data;
                             this.$store.commit("setToken", token);
-
-                            this.$message.success("登录成功");
-
-                            // 处理登录后重定向
+                        this.$message.success(response.data.message || "登录成功");
                             const redirect = this.$route.query.redirect || "/";
                             this.$router.push(redirect);
-                        } else {
-                            this.$message.error(response.data.message || "登录失败");
-                        }
                     } catch (error) {
-                        let errorMessage = "登录失败，请重试";
-                        if (error.response) {
-                            errorMessage = error.response.data.message || errorMessage;
-                            if (error.response.status === 401) {
-                                this.$store.commit("clearToken");
-                            }
-                        }
+                        const errorMessage = error.response?.data?.message || "登录失败，请重试";
                         this.$message.error(errorMessage);
                     } finally {
                         this.loading = false;
@@ -106,9 +91,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: url("@/assets/images/login/background.jpg") no-repeat center/cover;
-    background-size: cover;
-    background-position: center;
+    background: url("@/assets/images/system/auth/login/background.jpg") no-repeat center/cover;
 }
 
 .title {
@@ -120,27 +103,19 @@ export default {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.container {
-    text-align: center;
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
 .login-form {
     background: rgba(0, 0, 0, 0.6);
     padding: 24px 30px 30px;
     border-radius: 10px;
-    width: 320px;
+    width: 350px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
 }
 
-.user { margin-bottom: 18px; }
-.user img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3); }
+.icon { margin-bottom: 18px; }
+.icon img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3); }
 
 ::v-deep .el-form-item { margin-bottom: 16px; }
 ::v-deep .el-input__inner { background-color: rgba(255,255,255,0.15) !important; border: 1px solid rgba(255,255,255,0.2) !important; color: #fff !important; height: 45px; border-radius: 8px; font-size: 14px; }
@@ -158,6 +133,6 @@ export default {
 @media (max-width: 480px) {
     .login-form { width: 90%; padding: 20px; }
     .title { font-size: 20px; }
-    .user img { width: 60px; height: 60px; }
+    .icon img { width: 60px; height: 60px; }
 }
 </style>

@@ -1,16 +1,18 @@
 package top.kscn.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.kscn.common.Result;
 import top.kscn.entity.UserFile;
 import top.kscn.service.FileStorageService;
 import top.kscn.service.UserFileService;
-import top.kscn.utils.SecurityInfo;
+import top.kscn.utils.SecurityContextUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +20,10 @@ import java.util.Map;
 /**
  * 用户文件管理控制器
  * 基于数据库的用户文件管理系统
- * userId自动从token中解析
+ * userId 自动从 token 中解析
  */
 @RestController
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/user-files")
 public class UserFileController {
 
@@ -39,8 +42,7 @@ public class UserFileController {
     public Result<Map<String, Object>> checkInstantUpload(
             @RequestParam String fileMd5,
             @RequestParam Long fileSize) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         Map<String, Object> result = userFileService.checkInstantUpload(userId, fileMd5, fileSize);
         return Result.success("检查完成", result);
     }
@@ -53,8 +55,7 @@ public class UserFileController {
             @RequestParam(required = false) Long parentId,
             @RequestParam String fileMd5,
             @RequestParam MultipartFile file) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         UserFile userFile = userFileService.uploadFile(userId, parentId, file, fileMd5);
         return Result.success("文件上传成功", userFile);
     }
@@ -67,8 +68,7 @@ public class UserFileController {
             @RequestParam(required = false) Long parentId,
             @RequestParam String fileName,
             @RequestParam Long storageId) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         UserFile userFile = userFileService.createFileFromStorage(userId, parentId, fileName, storageId);
         return Result.success("秒传成功", userFile);
     }
@@ -81,7 +81,6 @@ public class UserFileController {
             @RequestParam String fileName,
             @RequestParam Long fileSize,
             @RequestParam String fileMd5) {
-
         Map<String, Object> result = userFileService.initChunkedUpload(fileName, fileSize, fileMd5);
         return Result.success("初始化成功", result);
     }
@@ -94,9 +93,8 @@ public class UserFileController {
             @RequestParam String uploadId,
             @RequestParam Integer chunkNumber,
             @RequestParam MultipartFile chunk) {
-
         fileStorageService.uploadChunk(uploadId, chunkNumber, chunk);
-        return Result.success("分片上传成功");
+        return Result.success("分片上传成功", null);
     }
 
     /**
@@ -107,8 +105,7 @@ public class UserFileController {
             @RequestParam String uploadId,
             @RequestParam(required = false) Long parentId,
             @RequestParam String fileName) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         UserFile userFile = userFileService.completeChunkedUpload(userId, parentId, fileName, uploadId);
         return Result.success("上传完成", userFile);
     }
@@ -119,7 +116,7 @@ public class UserFileController {
     @PostMapping("/upload/cancel")
     public Result<?> cancelChunkedUpload(@RequestParam String uploadId) {
         fileStorageService.cancelChunkedUpload(uploadId);
-        return Result.success("取消成功");
+        return Result.success("取消成功", null);
     }
 
     /**
@@ -140,8 +137,7 @@ public class UserFileController {
     public Result<UserFile> createFolder(
             @RequestParam(required = false) Long parentId,
             @RequestParam String folderName) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         UserFile folder = userFileService.createFolder(userId, parentId, folderName);
         return Result.success("文件夹创建成功", folder);
     }
@@ -150,10 +146,8 @@ public class UserFileController {
      * 获取文件列表
      */
     @GetMapping("/list")
-    public Result<List<UserFile>> listFiles(
-            @RequestParam(required = false) Long parentId) {
-
-        Long userId = SecurityInfo.getUserId();
+    public Result<List<UserFile>> listFiles(@RequestParam(required = false) Long parentId) {
+        Long userId = SecurityContextUtil.currentUserId();
         List<UserFile> files = userFileService.listFiles(userId, parentId);
         return Result.success("获取文件列表成功", files);
     }
@@ -163,7 +157,7 @@ public class UserFileController {
      */
     @GetMapping("/tree")
     public Result<List<Map<String, Object>>> getDirectoryTree() {
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         List<Map<String, Object>> tree = userFileService.getDirectoryTree(userId);
         return Result.success("获取目录树成功", tree);
     }
@@ -173,8 +167,7 @@ public class UserFileController {
      */
     @GetMapping("/folder/id")
     public Result<Long> getFolderIdByPath(@RequestParam String path) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         Long folderId = userFileService.getFolderIdByPath(userId, path);
         return Result.success("获取文件夹ID成功", folderId);
     }
@@ -186,10 +179,9 @@ public class UserFileController {
      */
     @DeleteMapping("/delete")
     public Result<?> deleteFile(@RequestParam Long fileId) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         userFileService.deleteFile(userId, fileId);
-        return Result.success("文件已移入回收站");
+        return Result.success("文件已移入回收站", null);
     }
 
     /**
@@ -197,10 +189,9 @@ public class UserFileController {
      */
     @DeleteMapping("/delete/permanent")
     public Result<?> permanentDeleteFile(@RequestParam Long fileId) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         userFileService.permanentDeleteFile(userId, fileId);
-        return Result.success("文件已彻底删除");
+        return Result.success("文件已彻底删除", null);
     }
 
     /**
@@ -210,10 +201,9 @@ public class UserFileController {
     public Result<?> renameFile(
             @RequestParam Long fileId,
             @RequestParam String newName) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         userFileService.renameFile(userId, fileId, newName);
-        return Result.success("重命名成功");
+        return Result.success("重命名成功", null);
     }
 
     /**
@@ -223,10 +213,9 @@ public class UserFileController {
     public Result<?> moveFile(
             @RequestParam Long fileId,
             @RequestParam(required = false) Long targetParentId) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         userFileService.moveFile(userId, fileId, targetParentId);
-        return Result.success("移动成功");
+        return Result.success("移动成功", null);
     }
 
     /**
@@ -234,8 +223,7 @@ public class UserFileController {
      */
     @GetMapping("/search")
     public Result<List<UserFile>> searchFiles(@RequestParam String keyword) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         List<UserFile> files = userFileService.searchFiles(userId, keyword);
         return Result.success("搜索完成", files);
     }
@@ -251,8 +239,7 @@ public class UserFileController {
             @RequestHeader(value = "Range", required = false) String range,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         userFileService.downloadFile(userId, fileId, range, response);
     }
 
@@ -265,8 +252,7 @@ public class UserFileController {
             @RequestHeader(value = "Range", required = false) String range,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         userFileService.downloadFolder(userId, folderId, range, response);
     }
 
@@ -275,7 +261,7 @@ public class UserFileController {
      */
     @PostMapping("/download/batch")
     public Result<Map<String, Object>> batchDownload(@RequestBody List<Long> fileIds) {
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         Map<String, Object> result = userFileService.createBatchDownloadTask(userId, fileIds);
         return Result.success("批量下载任务创建成功", result);
     }
@@ -289,8 +275,7 @@ public class UserFileController {
             @RequestHeader(value = "Range", required = false) String range,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         userFileService.downloadBatchTask(userId, taskId, range, response);
     }
 
@@ -301,9 +286,19 @@ public class UserFileController {
      */
     @GetMapping("/space")
     public Result<Map<String, Object>> getUserSpaceInfo() {
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         Map<String, Object> spaceInfo = userFileService.getUserSpaceInfo(userId);
         return Result.success("获取空间信息成功", spaceInfo);
+    }
+
+    /**
+     * 获取用户文件数量
+     */
+    @GetMapping("/count")
+    public Result<Long> getUserFileCount() {
+        Long userId = SecurityContextUtil.currentUserId();
+        Long fileCount = userFileService.getUserFileCount(userId);
+        return Result.success("获取文件数量成功", fileCount);
     }
 
     // ==================== 回收站 ====================
@@ -313,7 +308,7 @@ public class UserFileController {
      */
     @GetMapping("/recycle")
     public Result<List<UserFile>> getRecycleBin() {
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         List<UserFile> files = userFileService.getRecycleBin(userId);
         return Result.success("获取回收站列表成功", files);
     }
@@ -323,10 +318,9 @@ public class UserFileController {
      */
     @PutMapping("/recycle/restore")
     public Result<?> restoreFile(@RequestParam Long fileId) {
-
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         userFileService.restoreFile(userId, fileId);
-        return Result.success("文件恢复成功");
+        return Result.success("文件恢复成功", null);
     }
 
     /**
@@ -334,10 +328,8 @@ public class UserFileController {
      */
     @DeleteMapping("/recycle/empty")
     public Result<?> emptyRecycleBin() {
-        Long userId = SecurityInfo.getUserId();
+        Long userId = SecurityContextUtil.currentUserId();
         userFileService.emptyRecycleBin(userId);
-        return Result.success("回收站已清空");
+        return Result.success("回收站已清空", null);
     }
 }
-
-

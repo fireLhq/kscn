@@ -27,23 +27,27 @@ export default {
             const authPages = ['/login', '/register', '/recover'];
             return !authPages.includes(this.$route.path);
         }
-    },
-    created() {
-        // 初始化时恢复登录状态
-        const token = localStorage.getItem("jwt_token"); // 从localStorage中获取token
-        if (token) {
-            this.$store.commit("setToken", token); // 将token存储到vuex中
-        }
-    },
-    watch: {
-        $route() {
-            // 路由变化时重新计算是否显示导航栏和页脚
-        }
     }
 };
 </script>
 
 <style>
-/* 这里可以引入全局的样式 */
-@import "@/assets/styles/_common.css";
+/* 仅保留基础全局样式，避免页面明显变化 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+    min-height: 100%;
+}
+
+body {
+    line-height: 1.6;
+    color: #495057;
+    background-color: #f8f9fa;
+}
 </style>

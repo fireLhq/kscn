@@ -41,43 +41,43 @@
                     <div class="payment-methods">
                         <div class="payment-method">
                             <div class="payment-icon">
-                                <img src="@/assets/images/home/subpages/sponsor/支付宝.svg" alt="支付宝" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/支付宝.svg" alt="支付宝" />
                             </div>
                             <h3>支付宝</h3>
                             <p>使用支付宝扫码或转账</p>
                             <div class="qr-code">
-                                <img src="@/assets/images/home/subpages/sponsor/支付宝二维码.jpg" alt="支付宝二维码" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/支付宝二维码.jpg" alt="支付宝二维码" />
                             </div>
                             <p class="account-info">huohua.lhq@outlook.com</p>
                         </div>
                         
                         <div class="payment-method">
                             <div class="payment-icon">
-                                <img src="@/assets/images/home/subpages/sponsor/微信.svg" alt="微信" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/微信.svg" alt="微信" />
                             </div>
                             <h3>微信支付</h3>
                             <p>使用微信扫码支付</p>
                             <div class="qr-code">
-                                <img src="@/assets/images/home/subpages/sponsor/微信二维码.png" alt="微信二维码" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/微信二维码.png" alt="微信二维码" />
                             </div>
                             <p class="account-info">微信号：DiracEq</p>
                         </div>
                         
                         <div class="payment-method">
                             <div class="payment-icon">
-                                <img src="@/assets/images/home/subpages/sponsor/PayPal.svg" alt="PayPal" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/PayPal.svg" alt="PayPal" />
                             </div>
                             <h3>PayPal</h3>
                             <p>国际用户可使用PayPal</p>
                             <div class="qr-code">
-                                <img src="@/assets/images/home/subpages/sponsor/未填二维码.svg" alt="PayPal二维码" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/未填二维码.svg" alt="PayPal二维码" />
                             </div>
                             <p class="account-info">邮箱：huohua.lhq@gmail.com</p>
                         </div>
 
                         <div class="payment-method">
                             <div class="payment-icon">
-                                <img src="@/assets/images/home/subpages/sponsor/银联.svg" alt="银行卡" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/银联.svg" alt="银行卡" />
                             </div>
                             <h3>银行转账</h3>
                             <p>支持各大银行转账（人民币）</p>
@@ -95,7 +95,7 @@
                         
                         <div class="payment-method">
                             <div class="payment-icon">
-                                <img src="@/assets/images/home/subpages/sponsor/Visa.svg" alt="银行卡" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/Visa.svg" alt="银行卡" />
                             </div>
                             <h3>银行转账</h3>
                             <p>支持各大银行转账（美元）</p>
@@ -118,9 +118,9 @@
                             </div>
                             <div class="level-benefits">
                                 <ul>
-                                    <li>获得赞助者徽章</li>
-                                    <li>优先体验新功能</li>
-                                    <li>专属感谢页面展示</li>
+                                    <li>每一份支持都会被我们认真珍惜</li>
+                                    <li>帮助平台分担日常运行与维护成本</li>
+                                    <li>为后续功能完善提供持续动力</li>
                                 </ul>
                             </div>
                         </div>
@@ -132,10 +132,9 @@
                             </div>
                             <div class="level-benefits">
                                 <ul>
-                                    <li>包含青铜赞助者所有权益</li>
-                                    <li>获得高级用户标识</li>
-                                    <li>优先技术支持</li>
-                                    <li>参与功能投票</li>
+                                    <li>体现你对平台长期发展的认可与鼓励</li>
+                                    <li>帮助我们投入更多精力完善核心功能</li>
+                                    <li>让平台能够持续保持稳定更新</li>
                                 </ul>
                             </div>
                         </div>
@@ -147,10 +146,9 @@
                             </div>
                             <div class="level-benefits">
                                 <ul>
-                                    <li>包含白银赞助者所有权益</li>
-                                    <li>获得VIP用户标识</li>
-                                    <li>专属客服通道</li>
-                                    <li>参与项目决策</li>
+                                    <li>为平台优化体验与补充功能提供更大支持</li>
+                                    <li>帮助我们覆盖更多开发与服务成本</li>
+                                    <li>让 KSCN 能够更从容地持续成长</li>
                                 </ul>
                             </div>
                         </div>
@@ -162,11 +160,9 @@
                             </div>
                             <div class="level-benefits">
                                 <ul>
-                                    <li>包含黄金赞助者所有权益</li>
-                                    <li>获得终身VIP标识</li>
-                                    <li>专属项目经理</li>
-                                    <li>参与核心决策</li>
-                                    <li>定制化服务</li>
+                                    <li>是对平台建设与维护非常重要的支持力量</li>
+                                    <li>帮助我们在稳定运行之外推进更多规划</li>
+                                    <li>让这个项目能够陪伴更多用户长期使用</li>
                                 </ul>
                             </div>
                         </div>
