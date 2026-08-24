@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import top.kscn.common.Result;
+import top.kscn.annotation.OperationLog;
 import top.kscn.entity.SystemMessage;
 import top.kscn.entity.dto.systemMessage.SystemMessageManageDTO;
 import top.kscn.entity.dto.systemMessage.SystemMessageQueryDTO;
@@ -37,12 +38,14 @@ public class AdminSystemMessageController {
     }
 
     @PostMapping
+    @OperationLog(eventType = "ADMIN", action = "CREATE_SYSTEM_MESSAGE", resourceType = "SYSTEM_MESSAGE")
     public Result<?> postSystemMessage(@RequestBody @Validated(SystemMessageManageDTO.CreateGroup.class) SystemMessageManageDTO dto) {
         systemMessageService.postSystemMessage(dto, SecurityContextUtil.currentUserId());
         return Result.success("发布成功", null);
     }
 
     @PutMapping("/{systemMessageId}")
+    @OperationLog(eventType = "ADMIN", action = "UPDATE_SYSTEM_MESSAGE", resourceType = "SYSTEM_MESSAGE", resourceIdParam = "systemMessageId")
     public Result<?> putSystemMessage(@PathVariable Long systemMessageId,
                                       @RequestBody @Validated(SystemMessageManageDTO.UpdateGroup.class) SystemMessageManageDTO dto) {
         systemMessageService.putSystemMessage(systemMessageId, dto, SecurityContextUtil.currentUserId());
@@ -50,6 +53,7 @@ public class AdminSystemMessageController {
     }
 
     @DeleteMapping("/{systemMessageId}")
+    @OperationLog(eventType = "ADMIN", action = "DELETE_SYSTEM_MESSAGE", resourceType = "SYSTEM_MESSAGE", resourceIdParam = "systemMessageId")
     public Result<?> deleteSystemMessage(@PathVariable Long systemMessageId) {
         systemMessageService.deleteSystemMessage(systemMessageId);
         return Result.success("删除成功", null);

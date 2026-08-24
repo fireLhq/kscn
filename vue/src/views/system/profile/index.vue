@@ -142,8 +142,8 @@
                         <div class="stat-label">文件数量</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number stat-number-sm stat-ip">{{ loginStats.lastLoginIp || '--' }}</div>
-                        <div class="stat-label">最后登录 IP</div>
+                        <div class="stat-number stat-number-sm stat-ip">{{ loginStats.lastLoginLocation || loginStats.lastLoginIp || '--' }}</div>
+                        <div class="stat-label">最后登录地点</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-number stat-number-sm stat-datetime" v-if="formatDateTime(loginStats.lastActiveTime) !== '--'">
@@ -297,6 +297,7 @@ export default {
                 loginCount: 0,
                 lastActiveTime: null,
                 lastLoginIp: null,
+                lastLoginLocation: null,
             },
             submitting: false,
             codeCountdown: 0,
@@ -408,6 +409,7 @@ export default {
                         loginCount: res.data.data.loginCount || 0,
                         lastActiveTime: res.data.data.lastActiveTime || null,
                         lastLoginIp: res.data.data.lastLoginIp || null,
+                        lastLoginLocation: res.data.data.lastLoginLocation || null,
                     };
                 }
             } catch (e) {
@@ -415,6 +417,7 @@ export default {
                     loginCount: 0,
                     lastActiveTime: null,
                     lastLoginIp: null,
+                    lastLoginLocation: null,
                 };
             }
         },

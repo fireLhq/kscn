@@ -14,11 +14,22 @@
         </section>
 
         <section class="panel-card recent-card">
-            <div class="panel-header">
+                <div class="panel-header recent-header">
                 <div>
                     <h3>最近登录用户</h3>
                 </div>
-                <el-tag size="small" effect="dark">最近 {{ recentLogs.length }} 条</el-tag>
+                    <div class="recent-controls">
+                        <el-select :value="recentLimit" size="mini" @change="changeRecentLimit">
+                            <el-option v-for="value in [8, 16, 24, 56]" :key="value" :value="value" :label="`${value} 条`" />
+                        </el-select>
+                        <el-select :value="recentDays" size="mini" clearable placeholder="全部时间" @change="changeRecentDays">
+                            <el-option :value="1" label="24小时内" />
+                            <el-option :value="2" label="48小时内" />
+                            <el-option :value="3" label="3日内" />
+                            <el-option :value="7" label="7日内" />
+                        </el-select>
+                        <el-tag size="small" effect="dark">显示 {{ recentLogs.length }} 条</el-tag>
+                    </div>
             </div>
 
             <el-table
@@ -69,6 +80,8 @@ export default {
             type: Array,
             default: () => [],
         },
+        recentLimit: { type: Number, default: 8 },
+        recentDays: { type: Number, default: null },
     },
     computed: {
         statCards() {
@@ -158,6 +171,12 @@ export default {
         },
         avatarUrl(filename) {
             return getUserAvatarUrl(filename, Date.now()) || require("@/assets/images/components/avatar/user.png");
+        },
+        changeRecentLimit(value) {
+            this.$emit("recent-filter-change", { limit: Number(value), days: this.recentDays });
+        },
+        changeRecentDays(value) {
+            this.$emit("recent-filter-change", { limit: this.recentLimit, days: value ? Number(value) : null });
         },
     },
 };
@@ -259,6 +278,22 @@ export default {
     font-size: 13px;
 }
 
+.recent-header {
+    align-items: center;
+}
+
+.recent-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.recent-controls .el-select {
+    width: 110px;
+}
+
 .recent-table {
     width: 100%;
 }
@@ -290,6 +325,11 @@ export default {
 
     .panel-header {
         flex-direction: column;
+    }
+
+    .recent-controls {
+        width: 100%;
+        justify-content: flex-start;
     }
 }
 </style>

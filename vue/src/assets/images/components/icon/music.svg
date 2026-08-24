@@ -1,1 +1,32 @@
-<svg id="music" data-name="music" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256"><defs><style>.cls-1{fill:#fff;stroke:#797774;stroke-linejoin:round;stroke-width:4px;}.cls-2{fill:url(#未命名的渐变_9);}.cls-3{fill:url(#未命名的渐变_2);}.cls-4{fill:url(#未命名的渐变_3);}</style><radialGradient id="未命名的渐变_9" cx="158.4445" cy="201.76378" r="6.19276" gradientTransform="matrix(12.89817, -9.0315, -9.59623, -13.70483, -7.24019, 4295.16893)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#494b48"/><stop offset="1" stop-color="#222526"/></radialGradient><radialGradient id="未命名的渐变_2" cx="359.83629" cy="-293.43028" r="8.8133" gradientTransform="matrix(4.55707, -3.19089, -3.29119, -4.70456, -2490.54902, -114.53293)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="0.19131" stop-color="#fcfcfc"/><stop offset="1" stop-color="#cecece"/></radialGradient><radialGradient id="未命名的渐变_3" cx="378.13472" cy="-266.29527" r="23.40377" gradientTransform="matrix(-5.13685, 3.59686, 2.97344, 4.24651, 2828.33576, -138.9922)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fc904d"/><stop offset="0.23305" stop-color="#f78f52"/><stop offset="1" stop-color="#8862c2"/></radialGradient></defs><title>music</title><polygon class="cls-1" points="222.5 254 33.5 254 33.5 2 167.5 2 222.5 57 222.5 254"/><polygon class="cls-1" points="222.5 57 167.5 57 167.5 2 222.5 57"/><g id="layer1"><g id="g9218"><path id="path9162" class="cls-2" d="M191.97893,137.99844A63.97851,63.97851,0,0,1,128.00041,201.977h0a63.97852,63.97852,0,1,1,63.97852-63.97852Z"/><path id="circle9164" class="cls-3" d="M114.9842,117.72707a24.09088,24.09088,0,0,0,13.01606,44.36271h.00018A24.09087,24.09087,0,0,0,152.091,137.99854v-.00042a24.09035,24.09035,0,0,0-37.10677-20.27105Zm8.72962,13.59563a7.93379,7.93379,0,0,1,12.22081,6.67556v.00044a7.93387,7.93387,0,0,1-7.93433,7.93339h-.0002a7.93342,7.93342,0,0,1-4.28629-14.60939Z"/><path id="circle9169" class="cls-4" d="M90.98016,85.82517a64.013,64.013,0,1,0,86.13551,11.19539l-21.60508,15.128,6.1902,8.84052,12.78135-8.94961a53.11724,53.11724,0,1,1-18.67108-19.44l9.43788-6.60847a63.85515,63.85515,0,0,0-74.26878-.16584Z"/></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+<style type="text/css">
+	.st0{fill:#FFFFFF;stroke:#797774;stroke-width:4;stroke-linejoin:round;}
+	.st1{fill:url(#SVGID_1_);}
+	.st2{fill:url(#SVGID_2_);}
+	.st3{fill:url(#SVGID_3_);}
+</style>
+<polygon class="st0" points="222.5,254 33.5,254 33.5,2 167.5,2 222.5,57 "/>
+<polygon class="st0" points="222.5,57 167.5,57 167.5,2 "/>
+<radialGradient id="SVGID_1_" cx="-206.7693" cy="458.1201" r="6.1928" gradientTransform="matrix(12.8982 -9.0315 9.5962 13.7048 -1629.0474 -8046.8555)" gradientUnits="userSpaceOnUse">
+	<stop  offset="0" style="stop-color:#494B48"/>
+	<stop  offset="1" style="stop-color:#222526"/>
+</radialGradient>
+<path class="st1" d="M192,138c0,35.3-28.6,64-64,64c0,0,0,0,0,0l0,0c-35.3,0-64-28.6-64-64s28.6-64,64-64S192,102.7,192,138L192,138
+	L192,138z"/>
+<radialGradient id="SVGID_2_" cx="5.2529" cy="1012.4246" r="8.8133" gradientTransform="matrix(4.5571 -3.1909 3.2912 4.7046 -3241.0347 -4628.5215)" gradientUnits="userSpaceOnUse">
+	<stop  offset="0" style="stop-color:#FFFFFF"/>
+	<stop  offset="0.1913" style="stop-color:#FCFCFC"/>
+	<stop  offset="1" style="stop-color:#CECECE"/>
+</radialGradient>
+<path class="st2" d="M115,117.7c-11.2,7.2-14.4,22.1-7.3,33.3c4.4,6.9,12.1,11.1,20.3,11.1h0c13.3,0,24.1-10.8,24.1-24.1
+	c0,0,0,0,0,0v0c0-13.3-10.8-24.1-24.1-24.1C123.4,113.9,118.9,115.2,115,117.7L115,117.7z M123.7,131.3c3.7-2.4,8.6-1.3,11,2.4
+	c0.8,1.3,1.3,2.8,1.3,4.3v0c0,4.4-3.6,7.9-7.9,7.9h0c-4.4,0-7.9-3.6-7.9-7.9C120.1,135.3,121.4,132.8,123.7,131.3z"/>
+<radialGradient id="SVGID_3_" cx="-7.3939" cy="795.6234" r="23.4038" gradientTransform="matrix(-5.1368 3.5969 -2.9734 -4.2465 2421.8582 3495.4976)" gradientUnits="userSpaceOnUse">
+	<stop  offset="0" style="stop-color:#FC904D"/>
+	<stop  offset="0.2331" style="stop-color:#F78F52"/>
+	<stop  offset="1" style="stop-color:#8862C2"/>
+</radialGradient>
+<path class="st3" d="M91,85.8c-28.8,20.4-35.7,60.4-15.2,89.2s60.4,35.7,89.2,15.2s35.7-60.4,15.2-89.2c-1-1.4-2-2.7-3.1-4
+	l-21.6,15.1l6.2,8.8l12.8-8.9c14.3,25.6,5.1,58-20.5,72.3s-58,5.1-72.3-20.5s-5.1-58,20.5-72.3c16.7-9.3,37.2-8.9,53.6,1.1l9.4-6.6
+	C143.1,70.1,113.2,70,91,85.8z"/>
+</svg>

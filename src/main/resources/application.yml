@@ -24,3 +24,9 @@ jwt:
 
 cookie:
   max-age: 36000
+
+operation-log:
+  enabled: ${OPERATION_LOG_ENABLED:true}
+
+geoip:
+  database-path: data/geoip/GeoLite2-City.mmdb

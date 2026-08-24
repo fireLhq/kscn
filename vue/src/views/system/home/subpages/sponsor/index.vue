@@ -55,7 +55,7 @@
                             <div class="payment-icon">
                                 <img src="@/assets/images/system/home/subpages/sponsor/微信.svg" alt="微信" />
                             </div>
-                            <h3>微信支付</h3>
+                            <h3>微信</h3>
                             <p>使用微信扫码支付</p>
                             <div class="qr-code">
                                 <img src="@/assets/images/system/home/subpages/sponsor/微信二维码.png" alt="微信二维码" />
@@ -68,41 +68,33 @@
                                 <img src="@/assets/images/system/home/subpages/sponsor/PayPal.svg" alt="PayPal" />
                             </div>
                             <h3>PayPal</h3>
-                            <p>国际用户可使用PayPal</p>
+                            <p>Use PayPal to scan and pay</p>
                             <div class="qr-code">
-                                <img src="@/assets/images/system/home/subpages/sponsor/未填二维码.svg" alt="PayPal二维码" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/PayPal二维码.jpg" alt="PayPal二维码" />
                             </div>
-                            <p class="account-info">邮箱：huohua.lhq@gmail.com</p>
+                            <p class="account-info">huohua.lhq@gmail.com</p>
                         </div>
 
                         <div class="payment-method">
                             <div class="payment-icon">
-                                <img src="@/assets/images/system/home/subpages/sponsor/银联.svg" alt="银行卡" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/AlipayHK.svg" alt="AlipayHK" />
                             </div>
-                            <h3>银行转账</h3>
-                            <p>支持各大银行转账（人民币）</p>
-                            <div class="bank-info">
-                                <p><strong>开户行：</strong>中国银行</p>
-                                <p><strong>账号：</strong>62**************319</p>
-                                <p><strong>户名：</strong>**骑</p>
+                            <h3>AlipayHK</h3>
+                            <p>使用AlipayHK掃碼支付</p>
+                            <div class="qr-code">
+                                <img src="@/assets/images/system/home/subpages/sponsor/AlipayHK二维码.png" alt="AlipayHK二维码" />
                             </div>
-                            <div class="bank-info">
-                                <p><strong>开户行：</strong>中国农业银行</p>
-                                <p><strong>账号：</strong>62**************173</p>
-                                <p><strong>户名：</strong>**骑</p>
-                            </div>
+                            <p class="account-info">19122685314</p>
                         </div>
-                        
+
                         <div class="payment-method">
                             <div class="payment-icon">
-                                <img src="@/assets/images/system/home/subpages/sponsor/Visa.svg" alt="银行卡" />
+                                <img src="@/assets/images/system/home/subpages/sponsor/注意.svg" alt="注意" />
                             </div>
-                            <h3>银行转账</h3>
-                            <p>支持各大银行转账（美元）</p>
+                            <h3>注意</h3>
+                            <p>谢绝异常转账</p>
                             <div class="bank-info">
-                                <p><strong>开户行：</strong>中国银行</p>
-                                <p><strong>账号：</strong>40***********810</p>
-                                <p><strong>户名：</strong>**骑</p>
+                                <p><strong>免责声明：</strong>本项目仅接受出于自愿的、小额的开源技术打赏。若发生“误转/多转”等异常资金情况，请勿私下联系作者退款。作者将一律交由支付平台客服或警方走官方原路退回流程处理，以防范网络洗钱风险。</p>
                             </div>
                         </div>
                     </div>

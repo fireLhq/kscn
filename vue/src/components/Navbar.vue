@@ -39,7 +39,7 @@
             </nav>
 
             <nav class="nav-items-2">
-                <div class="visitor-count">访客数量: <span>{{ visitorCount }}</span></div>
+                <div class="visitor-count">累计登录: <span>{{ visitorCount }}</span></div>
                 <el-dropdown :trigger="userDropdownTrigger" @command="handleUserCommand">
                     <span class="user-icon" @click="goToProfile">
                         <img :src="avatarUrl" alt="用户头像" class="user-avatar" />

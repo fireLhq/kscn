@@ -62,6 +62,14 @@
                         v-if="activeMenu === 'dashboard'"
                         :stats="stats"
                         :recent-logs="recentLogs"
+                        :recent-limit="recentLoginLimit"
+                        :recent-days="recentLoginDays"
+                        @recent-filter-change="handleRecentFilterChange"
+                    />
+
+                    <LogManagementPanel
+                        v-else-if="activeMenu === 'logs'"
+                        ref="logManagementPanel"
                     />
 
                     <UserManagementPanel
@@ -333,6 +341,7 @@ import DashboardPanel from "@/views/admin/components/DashboardPanel.vue";
 import UserManagementPanel from "@/views/admin/components/UserManagementPanel.vue";
 import MemberManagementPanel from "@/views/admin/components/MemberManagementPanel.vue";
 import SystemMessageManagementPanel from "@/views/admin/components/SystemMessageManagementPanel.vue";
+import LogManagementPanel from "@/views/admin/components/LogManagementPanel.vue";
 import { getAdminUserPage, getAdminUserStats, postAdminUser, putAdminUser, putAdminUserDefaultAvatar, putAdminUserRecalculateUsedSpace, deleteAdminUser } from "@/api/admin/user";
 import { getRecentLogins } from "@/api/system/login-log";
 import { getUserProfile, getUserAvatarUrl } from "@/api/system/user";
@@ -401,6 +410,7 @@ export default {
         UserManagementPanel,
         MemberManagementPanel,
         SystemMessageManagementPanel,
+        LogManagementPanel,
     },
     data() {
         const usernameValidator = (rule, value, callback) => {
@@ -424,6 +434,7 @@ export default {
                 { key: "users", label: "用户管理", icon: "el-icon-user-solid" },
                 { key: "members", label: "成员管理", icon: "el-icon-s-custom" },
                 { key: "systemMessages", label: "系统消息", icon: "el-icon-message-solid" },
+                { key: "logs", label: "日志管理", icon: "el-icon-document" },
             ],
             activeMenu: "dashboard",
             drawerVisible: false,
@@ -438,6 +449,8 @@ export default {
                 usedSpace: 0,
             },
             recentLogs: [],
+            recentLoginLimit: 8,
+            recentLoginDays: null,
             filters: createDefaultFilters(),
             tableData: [],
             tableLoading: false,
@@ -529,6 +542,7 @@ export default {
             if (this.activeMenu === "dashboard") return "仪表盘";
             if (this.activeMenu === "users") return "用户管理";
             if (this.activeMenu === "members") return "成员管理";
+            if (this.activeMenu === "logs") return "日志管理";
             return "系统消息";
         },
         userFormAvatarUrl() {
@@ -603,6 +617,10 @@ export default {
                 this.fetchMemberTable();
                 return;
             }
+            if (this.activeMenu === "logs") {
+                this.$nextTick(() => this.$refs.logManagementPanel && this.$refs.logManagementPanel.fetchLogs());
+                return;
+            }
             this.fetchSystemMessageTable();
         },
         async fetchStats() {
@@ -620,7 +638,9 @@ export default {
         },
         async fetchRecentLogs() {
             try {
-                const res = await getRecentLogins({ limit: 8 });
+                const params = { limit: this.recentLoginLimit };
+                if (this.recentLoginDays) params.days = this.recentLoginDays;
+                const res = await getRecentLogins(params);
                 if (res.data.code === 200) {
                     this.recentLogs = Array.isArray(res.data.data) ? res.data.data : [];
                 }
@@ -628,6 +648,11 @@ export default {
                 this.recentLogs = [];
                 this.$message.error(error.response?.data?.message || "加载最近登录信息失败");
             }
+        },
+        handleRecentFilterChange({ limit, days }) {
+            this.recentLoginLimit = limit || 8;
+            this.recentLoginDays = days || null;
+            this.fetchRecentLogs();
         },
         buildQueryParams() {
             const params = {

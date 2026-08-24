@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.kscn.common.Result;
 import top.kscn.entity.UserFile;
+import top.kscn.annotation.OperationLog;
 import top.kscn.service.FileStorageService;
 import top.kscn.service.UserFileService;
 import top.kscn.utils.SecurityContextUtil;
@@ -51,6 +52,7 @@ public class UserFileController {
      * 上传文件（小文件直接上传）
      */
     @PostMapping("/upload")
+    @OperationLog(eventType = "FILE", action = "UPLOAD", resourceType = "USER_FILE", resourceNameParam = "file")
     public Result<UserFile> uploadFile(
             @RequestParam(required = false) Long parentId,
             @RequestParam String fileMd5,
@@ -64,6 +66,7 @@ public class UserFileController {
      * 从已存在的物理文件创建用户文件（秒传）
      */
     @PostMapping("/upload/instant")
+    @OperationLog(eventType = "FILE", action = "INSTANT_UPLOAD", resourceType = "USER_FILE", resourceIdParam = "storageId", resourceNameParam = "fileName")
     public Result<UserFile> instantUpload(
             @RequestParam(required = false) Long parentId,
             @RequestParam String fileName,
@@ -77,6 +80,7 @@ public class UserFileController {
      * 初始化分片上传
      */
     @PostMapping("/upload/init")
+    @OperationLog(eventType = "FILE", action = "UPLOAD_INIT", resourceType = "USER_FILE", resourceNameParam = "fileName")
     public Result<Map<String, Object>> initChunkedUpload(
             @RequestParam String fileName,
             @RequestParam Long fileSize,
@@ -101,6 +105,7 @@ public class UserFileController {
      * 完成分片上传
      */
     @PostMapping("/upload/complete")
+    @OperationLog(eventType = "FILE", action = "UPLOAD", resourceType = "USER_FILE", resourceNameParam = "fileName")
     public Result<UserFile> completeChunkedUpload(
             @RequestParam String uploadId,
             @RequestParam(required = false) Long parentId,
@@ -114,6 +119,7 @@ public class UserFileController {
      * 取消分片上传
      */
     @PostMapping("/upload/cancel")
+    @OperationLog(eventType = "FILE", action = "UPLOAD_CANCEL", resourceType = "USER_FILE", resourceNameParam = "uploadId")
     public Result<?> cancelChunkedUpload(@RequestParam String uploadId) {
         fileStorageService.cancelChunkedUpload(uploadId);
         return Result.success("取消成功", null);
@@ -134,6 +140,7 @@ public class UserFileController {
      * 创建文件夹
      */
     @PostMapping("/folder")
+    @OperationLog(eventType = "FILE", action = "CREATE_FOLDER", resourceType = "USER_FILE", resourceNameParam = "folderName")
     public Result<UserFile> createFolder(
             @RequestParam(required = false) Long parentId,
             @RequestParam String folderName) {
@@ -178,6 +185,7 @@ public class UserFileController {
      * 删除文件（移入回收站）
      */
     @DeleteMapping("/delete")
+    @OperationLog(eventType = "FILE", action = "DELETE", resourceType = "USER_FILE", resourceIdParam = "fileId")
     public Result<?> deleteFile(@RequestParam Long fileId) {
         Long userId = SecurityContextUtil.currentUserId();
         userFileService.deleteFile(userId, fileId);
@@ -188,6 +196,7 @@ public class UserFileController {
      * 彻底删除文件
      */
     @DeleteMapping("/delete/permanent")
+    @OperationLog(eventType = "FILE", action = "PERMANENT_DELETE", resourceType = "USER_FILE", resourceIdParam = "fileId")
     public Result<?> permanentDeleteFile(@RequestParam Long fileId) {
         Long userId = SecurityContextUtil.currentUserId();
         userFileService.permanentDeleteFile(userId, fileId);
@@ -198,6 +207,7 @@ public class UserFileController {
      * 重命名文件
      */
     @PutMapping("/rename")
+    @OperationLog(eventType = "FILE", action = "RENAME", resourceType = "USER_FILE", resourceIdParam = "fileId", resourceNameParam = "newName")
     public Result<?> renameFile(
             @RequestParam Long fileId,
             @RequestParam String newName) {
@@ -210,6 +220,7 @@ public class UserFileController {
      * 移动文件
      */
     @PutMapping("/move")
+    @OperationLog(eventType = "FILE", action = "MOVE", resourceType = "USER_FILE", resourceIdParam = "fileId")
     public Result<?> moveFile(
             @RequestParam Long fileId,
             @RequestParam(required = false) Long targetParentId) {
@@ -234,6 +245,7 @@ public class UserFileController {
      * 下载文件（流式下载，支持断点续传）
      */
     @GetMapping("/download")
+    @OperationLog(eventType = "FILE", action = "DOWNLOAD", resourceType = "USER_FILE", resourceIdParam = "fileId")
     public void downloadFile(
             @RequestParam Long fileId,
             @RequestHeader(value = "Range", required = false) String range,
@@ -247,6 +259,7 @@ public class UserFileController {
      * 下载文件夹（打包成ZIP）
      */
     @GetMapping("/download/folder/{folderId}")
+    @OperationLog(eventType = "FILE", action = "DOWNLOAD_FOLDER", resourceType = "USER_FILE", resourceIdParam = "folderId")
     public void downloadFolder(
             @PathVariable Long folderId,
             @RequestHeader(value = "Range", required = false) String range,
@@ -260,6 +273,7 @@ public class UserFileController {
      * 批量下载文件（打包成ZIP）
      */
     @PostMapping("/download/batch")
+    @OperationLog(eventType = "FILE", action = "DOWNLOAD_BATCH", resourceType = "USER_FILE")
     public Result<Map<String, Object>> batchDownload(@RequestBody List<Long> fileIds) {
         Long userId = SecurityContextUtil.currentUserId();
         Map<String, Object> result = userFileService.createBatchDownloadTask(userId, fileIds);
@@ -270,6 +284,7 @@ public class UserFileController {
      * 下载批量下载任务的ZIP文件
      */
     @GetMapping("/download/batch/{taskId}")
+    @OperationLog(eventType = "FILE", action = "DOWNLOAD_BATCH", resourceType = "DOWNLOAD_TASK", resourceNameParam = "taskId")
     public void downloadBatchTask(
             @PathVariable String taskId,
             @RequestHeader(value = "Range", required = false) String range,
@@ -317,6 +332,7 @@ public class UserFileController {
      * 恢复文件
      */
     @PutMapping("/recycle/restore")
+    @OperationLog(eventType = "FILE", action = "RESTORE", resourceType = "USER_FILE", resourceIdParam = "fileId")
     public Result<?> restoreFile(@RequestParam Long fileId) {
         Long userId = SecurityContextUtil.currentUserId();
         userFileService.restoreFile(userId, fileId);
@@ -327,6 +343,7 @@ public class UserFileController {
      * 清空回收站
      */
     @DeleteMapping("/recycle/empty")
+    @OperationLog(eventType = "FILE", action = "EMPTY_RECYCLE_BIN", resourceType = "USER_FILE")
     public Result<?> emptyRecycleBin() {
         Long userId = SecurityContextUtil.currentUserId();
         userFileService.emptyRecycleBin(userId);

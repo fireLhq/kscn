@@ -24,23 +24,35 @@ CREATE TABLE `user` (
 
 
 # =========================
-# 登录日志表
+# 通用日志表
 # =========================
-CREATE TABLE `login_log` (
+CREATE TABLE `log` (
     `log_id` BIGINT AUTO_INCREMENT COMMENT '日志ID',
+    `event_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '事件时间',
+    `event_type` VARCHAR(50) NOT NULL COMMENT '事件类型（LOGIN/ACCESS/USER/FILE等）',
+    `action` VARCHAR(50) DEFAULT NULL COMMENT '具体动作',
     `user_id` BIGINT DEFAULT NULL COMMENT '用户ID',
-    `login_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '登录时间',
-    `ip` VARCHAR(45) DEFAULT NULL COMMENT '登录IP（支持IPv6）',
+    `ip` VARCHAR(45) DEFAULT NULL COMMENT '客户端IP（支持IPv6）',
     `user_agent` VARCHAR(500) DEFAULT NULL COMMENT '浏览器UA标识',
     `device_type` VARCHAR(20) DEFAULT NULL COMMENT '设备类型（PC/Mobile/Tablet）',
     `os` VARCHAR(50) DEFAULT NULL COMMENT '操作系统',
     `browser` VARCHAR(50) DEFAULT NULL COMMENT '浏览器',
-    `status` TINYINT NOT NULL DEFAULT 1 COMMENT '登录结果（0-失败，1-成功）',
-    `remark` VARCHAR(255) DEFAULT NULL COMMENT '备注（如失败原因）',
+    `http_method` VARCHAR(10) DEFAULT NULL COMMENT 'HTTP方法',
+    `request_path` VARCHAR(500) DEFAULT NULL COMMENT '请求路径',
+    `http_status` SMALLINT DEFAULT NULL COMMENT 'HTTP响应状态码',
+    `resource_type` VARCHAR(50) DEFAULT NULL COMMENT '资源类型（USER/FILE等）',
+    `resource_id` BIGINT DEFAULT NULL COMMENT '资源ID',
+    `resource_name` VARCHAR(255) DEFAULT NULL COMMENT '资源名称',
+    `status` TINYINT NOT NULL DEFAULT 1 COMMENT '结果（0-失败，1-成功）',
+    `remark` VARCHAR(500) DEFAULT NULL COMMENT '备注或失败原因',
+    `details_json` TEXT DEFAULT NULL COMMENT '扩展详情JSON（禁止保存密码等敏感信息）',
     PRIMARY KEY (`log_id`),
-    INDEX `idx_user_login` (`user_id`, `login_time`),
-    CONSTRAINT `fk_log_user` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='登录日志表';
+    INDEX `idx_log_event_time` (`event_time`),
+    INDEX `idx_log_user_time` (`user_id`, `event_time`),
+    INDEX `idx_log_type_time` (`event_type`, `event_time`),
+    INDEX `idx_log_resource_time` (`resource_type`, `resource_id`, `event_time`),
+    INDEX `idx_log_ip_time` (`ip`, `event_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通用操作与访问日志表';
 
 
 # =========================

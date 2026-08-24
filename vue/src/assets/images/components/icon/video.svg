@@ -1,1 +1,27 @@
-<svg id="video" data-name="video" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256"><defs><style>.cls-1{fill:#fff;stroke:#797774;stroke-linejoin:round;stroke-width:4px;}.cls-2{fill:url(#未命名的渐变_4);}.cls-3{fill:url(#未命名的渐变_2);}.cls-4{fill:url(#未命名的渐变_3);}</style><linearGradient id="未命名的渐变_4" x1="620.39711" y1="-257.69765" x2="684.30792" y2="-368.39446" gradientTransform="matrix(1.00156, 0, 0, -1.00156, -525.3718, -175.53518)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fd924b"/><stop offset="0.5" stop-color="#cc7384"/><stop offset="1" stop-color="#8b62c0"/></linearGradient><linearGradient id="未命名的渐变_2" x1="648.09974" y1="-257.84834" x2="648.09974" y2="-364.74384" gradientTransform="matrix(0.86416, -0.49892, -0.49892, -0.86416, -587.37652, 192.34238)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#4c4c4c"/><stop offset="1" stop-color="#222"/></linearGradient><linearGradient id="未命名的渐变_3" x1="634.94765" y1="-285.77343" x2="660.89426" y2="-330.53431" gradientTransform="matrix(0.99545, 0, 0, -0.99545, -521.32468, -173.67691)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e0e0e0"/></linearGradient></defs><title>vedio</title><polygon class="cls-1" points="222.5 254 33.5 254 33.5 2 167.5 2 222.5 57 222.5 254"/><polygon class="cls-1" points="222.5 57 167.5 57 167.5 2 222.5 57"/><circle id="path858" class="cls-2" cx="128" cy="138" r="64"/><circle id="path14118" class="cls-3" cx="128.00001" cy="138.00002" r="53.33277"/><path id="path33458" class="cls-4" d="M112.13715,112.03768v51.90857a3.17235,3.17235,0,0,0,5.02335,2.60842L153.92837,141.21c2.64614-1.82823,2.65655-4.72012,0-6.43612L117.1605,109.43027A3.14317,3.14317,0,0,0,112.13715,112.03768Z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+<style type="text/css">
+	.st0{fill:#FFFFFF;stroke:#797774;stroke-width:4;stroke-linejoin:round;}
+	.st1{fill:url(#SVGID_1_);}
+	.st2{fill:url(#SVGID_2_);}
+	.st3{fill:url(#SVGID_3_);}
+</style>
+<polygon class="st0" points="222.5,254 33.5,254 33.5,2 167.5,2 222.5,57 "/>
+<polygon class="st0" points="222.5,57 167.5,57 167.5,2 "/>
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="619.8208" y1="1257.1205" x2="683.7318" y2="1367.8175" gradientTransform="matrix(1.0016 0 0 1.0016 -524.7931 -1176.5164)">
+	<stop  offset="0" style="stop-color:#FD924B"/>
+	<stop  offset="0.5" style="stop-color:#CC7384"/>
+	<stop  offset="1" style="stop-color:#8B62C0"/>
+</linearGradient>
+<circle class="st1" cx="128" cy="138" r="64"/>
+<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="413.1933" y1="1394.7286" x2="413.1933" y2="1501.6425" gradientTransform="matrix(0.8642 -0.4989 0.4989 0.8642 -951.5938 -907.3136)">
+	<stop  offset="0" style="stop-color:#4C4C4C"/>
+	<stop  offset="1" style="stop-color:#222222"/>
+</linearGradient>
+<circle class="st2" cx="128" cy="138" r="53.3"/>
+<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="636.6492" y1="1287.4658" x2="662.5959" y2="1332.2267" gradientTransform="matrix(0.9955 0 0 0.9955 -523.0128 -1170.8149)">
+	<stop  offset="0" style="stop-color:#FFFFFF"/>
+	<stop  offset="1" style="stop-color:#E0E0E0"/>
+</linearGradient>
+<path class="st3" d="M112.1,112v51.9c0,1.8,1.4,3.2,3.1,3.2c0.7,0,1.3-0.2,1.9-0.6l36.8-25.3c2.6-1.8,2.7-4.7,0-6.4l-36.8-25.3
+	c-1.4-1-3.4-0.8-4.4,0.6C112.3,110.6,112.1,111.3,112.1,112z"/>
+</svg>

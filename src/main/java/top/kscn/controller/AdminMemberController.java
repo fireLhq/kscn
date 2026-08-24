@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import top.kscn.common.Result;
+import top.kscn.annotation.OperationLog;
 import top.kscn.entity.Member;
 import top.kscn.entity.dto.member.MemberDTO;
 import top.kscn.service.MemberService;
@@ -34,12 +35,14 @@ public class AdminMemberController {
     }
 
     @PostMapping
+    @OperationLog(eventType = "ADMIN", action = "CREATE_MEMBER", resourceType = "MEMBER")
     public Result<?> postMember(@RequestBody @Validated(MemberDTO.CreateGroup.class) MemberDTO dto) {
         memberService.postMember(dto);
         return Result.success("添加成功", null);
     }
 
     @PutMapping("/{memberId}")
+    @OperationLog(eventType = "ADMIN", action = "UPDATE_MEMBER", resourceType = "MEMBER", resourceIdParam = "memberId")
     public Result<?> putMember(@PathVariable Long memberId,
                                @RequestBody @Validated(MemberDTO.UpdateGroup.class) MemberDTO dto) {
         memberService.putMember(memberId, dto);
@@ -47,12 +50,14 @@ public class AdminMemberController {
     }
 
     @DeleteMapping("/{memberId}")
+    @OperationLog(eventType = "ADMIN", action = "DELETE_MEMBER", resourceType = "MEMBER", resourceIdParam = "memberId")
     public Result<?> deleteMember(@PathVariable Long memberId) {
         memberService.deleteMember(memberId);
         return Result.success("删除成功", null);
     }
 
     @PostMapping("/{memberId}/avatar")
+    @OperationLog(eventType = "ADMIN", action = "UPDATE_MEMBER_AVATAR", resourceType = "MEMBER", resourceIdParam = "memberId")
     public Result<?> postMemberAvatar(@PathVariable Long memberId,
                                       @RequestParam("file") MultipartFile file) throws Exception {
         String newFileName = memberService.postMemberAvatar(memberId, file);

@@ -261,23 +261,20 @@ export default {
 }
 
 .pagination-wrap {
-    margin-top: 14px;
+    margin-top: 18px;
     display: flex;
     justify-content: flex-end;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 2px;
 }
 
-@media (max-width: 1360px) {
+@media (max-width: 1080px) {
     .filter-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 720px) {
     .filter-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
     }
 
     .panel-header {
@@ -287,11 +284,10 @@ export default {
     .header-actions {
         justify-content: flex-start;
     }
-}
 
-@media (max-width: 640px) {
-    .filter-grid {
-        grid-template-columns: minmax(0, 1fr);
+    .pagination-wrap {
+        justify-content: flex-start;
+        overflow-x: auto;
     }
 
     .panel-card {

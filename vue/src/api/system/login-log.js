@@ -14,3 +14,11 @@ export function getRecentLogins(params = {}) {
     return service.get("/recent-logins", { params });
 }
 
+export function getAdminLogs(params = {}) {
+    return service.get("/admin-logs", { params });
+}
+
+export function getAdminLogDetail(logId) {
+    return service.get(`/admin-logs/${logId}`);
+}
+

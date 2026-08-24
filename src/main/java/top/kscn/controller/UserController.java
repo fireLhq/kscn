@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.kscn.common.Result;
+import top.kscn.annotation.OperationLog;
 import top.kscn.entity.User;
 import top.kscn.entity.dto.user.UserProfileDTO;
 import top.kscn.entity.dto.user.UserProfileEmailCodeDTO;
@@ -35,36 +36,42 @@ public class UserController {
     }
 
     @PutMapping("/profile")
+    @OperationLog(eventType = "USER", action = "UPDATE_PROFILE", resourceType = "USER")
     public Result<?> putUserProfile(@RequestBody @Valid UserProfileDTO dto) {
         userService.putUserProfile(SecurityContextUtil.currentUserId(), dto);
         return Result.success("更新成功", null);
     }
 
     @PutMapping("/profile/username")
+    @OperationLog(eventType = "USER", action = "UPDATE_USERNAME", resourceType = "USER")
     public Result<?> putUserProfileUsername(@RequestBody @Valid UserProfileUsernameDTO dto) {
         userService.putUserProfileUsername(SecurityContextUtil.currentUserId(), dto);
         return Result.success("更新成功", null);
     }
 
     @PostMapping("/profile/email/code")
+    @OperationLog(eventType = "USER", action = "REQUEST_EMAIL_CODE", resourceType = "USER")
     public Result<?> postUserProfileEmailCode(@RequestBody @Valid UserProfileEmailCodeDTO dto) {
         userService.postUserProfileEmailCode(dto);
         return Result.success("验证码已发送，请查收您的邮箱", null);
     }
 
     @PutMapping("/profile/email")
+    @OperationLog(eventType = "USER", action = "UPDATE_EMAIL", resourceType = "USER")
     public Result<?> putUserProfileEmail(@RequestBody @Valid UserProfileEmailDTO dto) {
         userService.putUserProfileEmail(SecurityContextUtil.currentUserId(), dto);
         return Result.success("更新成功", null);
     }
 
     @PutMapping("/profile/password")
+    @OperationLog(eventType = "USER", action = "UPDATE_PASSWORD", resourceType = "USER")
     public Result<?> putUserProfilePassword(@RequestBody @Valid UserProfilePasswordDTO dto) {
         userService.putUserProfilePassword(SecurityContextUtil.currentUserId(), dto);
         return Result.success("更新成功", null);
     }
 
     @PostMapping("/profile/avatar")
+    @OperationLog(eventType = "USER", action = "UPDATE_AVATAR", resourceType = "USER")
     public Result<?> postUserProfileAvatar(@RequestParam("file") MultipartFile file) throws Exception {
         String newFileName = userService.postUserProfileAvatar(SecurityContextUtil.currentUserId(), file);
         return Result.success("头像上传成功", newFileName);

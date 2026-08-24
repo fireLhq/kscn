@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.kscn.common.Result;
 import top.kscn.entity.PublicFile;
+import top.kscn.annotation.OperationLog;
 import top.kscn.service.FileStorageService;
 import top.kscn.service.PublicFileService;
 
@@ -48,6 +49,7 @@ public class PublicFileController {
      * 上传文件（小文件直接上传）
      */
     @PostMapping("/upload")
+    @OperationLog(eventType = "FILE", action = "UPLOAD", resourceType = "PUBLIC_FILE", resourceNameParam = "file")
     public Result<PublicFile> uploadFile(
             @RequestParam(required = false) Long parentId,
             @RequestParam String fileMd5,
@@ -61,6 +63,7 @@ public class PublicFileController {
      * 从已存在的物理文件创建公共文件（秒传）
      */
     @PostMapping("/upload/instant")
+    @OperationLog(eventType = "FILE", action = "INSTANT_UPLOAD", resourceType = "PUBLIC_FILE", resourceIdParam = "storageId", resourceNameParam = "fileName")
     public Result<PublicFile> instantUpload(
             @RequestParam(required = false) Long parentId,
             @RequestParam String fileName,
@@ -74,6 +77,7 @@ public class PublicFileController {
      * 初始化分片上传
      */
     @PostMapping("/upload/init")
+    @OperationLog(eventType = "FILE", action = "UPLOAD_INIT", resourceType = "PUBLIC_FILE", resourceNameParam = "fileName")
     public Result<Map<String, Object>> initChunkedUpload(
             @RequestParam String fileName,
             @RequestParam Long fileSize,
@@ -86,6 +90,7 @@ public class PublicFileController {
      * 上传分片
      */
     @PostMapping("/upload/chunk")
+    @OperationLog(eventType = "FILE", action = "UPLOAD_CHUNK", resourceType = "PUBLIC_FILE", resourceNameParam = "uploadId")
     public Result<?> uploadChunk(
             @RequestParam String uploadId,
             @RequestParam Integer chunkNumber,
@@ -98,6 +103,7 @@ public class PublicFileController {
      * 完成分片上传
      */
     @PostMapping("/upload/complete")
+    @OperationLog(eventType = "FILE", action = "UPLOAD", resourceType = "PUBLIC_FILE", resourceNameParam = "fileName")
     public Result<PublicFile> completeChunkedUpload(
             @RequestParam String uploadId,
             @RequestParam(required = false) Long parentId,
@@ -111,6 +117,7 @@ public class PublicFileController {
      * 取消分片上传
      */
     @PostMapping("/upload/cancel")
+    @OperationLog(eventType = "FILE", action = "UPLOAD_CANCEL", resourceType = "PUBLIC_FILE", resourceNameParam = "uploadId")
     public Result<?> cancelChunkedUpload(@RequestParam String uploadId) {
         fileStorageService.cancelChunkedUpload(uploadId);
         return Result.success("取消成功", null);
@@ -131,6 +138,7 @@ public class PublicFileController {
      * 创建文件夹
      */
     @PostMapping("/folder")
+    @OperationLog(eventType = "FILE", action = "CREATE_FOLDER", resourceType = "PUBLIC_FILE", resourceNameParam = "folderName")
     public Result<PublicFile> createFolder(
             @RequestParam(required = false) Long parentId,
             @RequestParam String folderName) {
@@ -204,6 +212,7 @@ public class PublicFileController {
      * 删除文件（移入回收站）
      */
     @DeleteMapping("/delete")
+    @OperationLog(eventType = "FILE", action = "DELETE", resourceType = "PUBLIC_FILE", resourceIdParam = "fileId")
     public Result<?> deleteFile(@RequestParam Long fileId) {
         publicFileService.deleteFile(fileId);
         return Result.success("文件已移入回收站", null);
@@ -213,6 +222,7 @@ public class PublicFileController {
      * 彻底删除文件
      */
     @DeleteMapping("/delete/permanent")
+    @OperationLog(eventType = "FILE", action = "PERMANENT_DELETE", resourceType = "PUBLIC_FILE", resourceIdParam = "fileId")
     public Result<?> permanentDeleteFile(@RequestParam Long fileId) {
         publicFileService.permanentDeleteFile(fileId);
         return Result.success("文件已彻底删除", null);
@@ -222,6 +232,7 @@ public class PublicFileController {
      * 重命名文件
      */
     @PutMapping("/rename")
+    @OperationLog(eventType = "FILE", action = "RENAME", resourceType = "PUBLIC_FILE", resourceIdParam = "fileId", resourceNameParam = "newName")
     public Result<?> renameFile(
             @RequestParam Long fileId,
             @RequestParam String newName) {
@@ -233,6 +244,7 @@ public class PublicFileController {
      * 移动文件
      */
     @PutMapping("/move")
+    @OperationLog(eventType = "FILE", action = "MOVE", resourceType = "PUBLIC_FILE", resourceIdParam = "fileId")
     public Result<?> moveFile(
             @RequestParam Long fileId,
             @RequestParam(required = false) Long targetParentId) {
@@ -247,6 +259,7 @@ public class PublicFileController {
      */
     @GetMapping("/download")
     @PreAuthorize("permitAll()")
+    @OperationLog(eventType = "FILE", action = "DOWNLOAD", resourceType = "PUBLIC_FILE", resourceIdParam = "fileId")
     public void downloadFile(
             @RequestParam Long fileId,
             @RequestHeader(value = "Range", required = false) String range,
@@ -260,6 +273,7 @@ public class PublicFileController {
      */
     @GetMapping("/download/folder/{folderId}")
     @PreAuthorize("permitAll()")
+    @OperationLog(eventType = "FILE", action = "DOWNLOAD_FOLDER", resourceType = "PUBLIC_FILE", resourceIdParam = "folderId")
     public void downloadFolder(
             @PathVariable Long folderId,
             @RequestHeader(value = "Range", required = false) String range,
@@ -273,6 +287,7 @@ public class PublicFileController {
      */
     @PostMapping("/download/batch")
     @PreAuthorize("permitAll()")
+    @OperationLog(eventType = "FILE", action = "DOWNLOAD_BATCH", resourceType = "PUBLIC_FILE")
     public Result<Map<String, Object>> batchDownload(@RequestBody List<Long> fileIds) {
         Map<String, Object> result = publicFileService.createBatchDownloadTask(fileIds);
         return Result.success("批量下载任务创建成功", result);
@@ -283,6 +298,7 @@ public class PublicFileController {
      */
     @GetMapping("/download/batch/{taskId}")
     @PreAuthorize("permitAll()")
+    @OperationLog(eventType = "FILE", action = "DOWNLOAD_BATCH", resourceType = "DOWNLOAD_TASK", resourceNameParam = "taskId")
     public void downloadBatchTask(
             @PathVariable String taskId,
             @RequestHeader(value = "Range", required = false) String range,
@@ -306,6 +322,7 @@ public class PublicFileController {
      * 恢复文件
      */
     @PutMapping("/recycle/restore")
+    @OperationLog(eventType = "FILE", action = "RESTORE", resourceType = "PUBLIC_FILE", resourceIdParam = "fileId")
     public Result<?> restoreFile(@RequestParam Long fileId) {
         publicFileService.restoreFile(fileId);
         return Result.success("文件恢复成功", null);
@@ -315,6 +332,7 @@ public class PublicFileController {
      * 清空回收站
      */
     @DeleteMapping("/recycle/empty")
+    @OperationLog(eventType = "FILE", action = "EMPTY_RECYCLE_BIN", resourceType = "PUBLIC_FILE")
     public Result<?> emptyRecycleBin() {
         publicFileService.emptyRecycleBin();
         return Result.success("回收站已清空", null);

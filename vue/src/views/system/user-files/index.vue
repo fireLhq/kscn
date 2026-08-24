@@ -5,33 +5,33 @@
                 <!-- 顶部工具栏 -->
                 <div class="toolbar">
                     <div class="toolbar-left">
-                        <el-button @click="goToRoot" :disabled="isAtRoot">
+                        <el-button class="toolbar-button root-button" title="返回根目录" @click="goToRoot" :disabled="isAtRoot">
                             <i class="el-icon-house"></i> 返回根目录
                         </el-button>
-                        <el-button @click="goBack" :disabled="!canGoBack">
+                        <el-button class="toolbar-button back-button" title="返回上级" @click="goBack" :disabled="!canGoBack">
                             <i class="el-icon-back"></i> 返回上级
                         </el-button>
-                        <el-button type="primary" @click="showUploadDialog = true">
+                        <el-button class="toolbar-button" title="上传文件" type="primary" @click="showUploadDialog = true">
                             <i class="el-icon-upload"></i> 上传文件
                         </el-button>
-                        <el-button @click="createFolder">
+                        <el-button class="toolbar-button" title="新建文件夹" @click="createFolder">
                             <i class="el-icon-folder-add"></i> 新建文件夹
                         </el-button>
-                        <el-button 
+                        <el-button class="toolbar-button"
                             @click="batchDownload" 
                             :disabled="!hasSelectedItems"
                             type="success"
                         >
                             <i class="el-icon-download"></i> 批量下载
                         </el-button>
-                        <el-button 
+                        <el-button class="toolbar-button"
                             @click="batchDelete" 
                             :disabled="!hasSelectedItems"
                             type="danger"
                         >
                             <i class="el-icon-delete"></i> 批量删除
                         </el-button>
-                        <el-button @click="refreshAll" type="info">
+                        <el-button class="toolbar-button" title="刷新" @click="refreshAll" type="info">
                             <i class="el-icon-refresh"></i> 刷新
                         </el-button>
                     </div>
@@ -40,6 +40,7 @@
                             v-model="searchQuery"
                             placeholder="搜索文件或文件夹..."
                             clearable
+                            class="toolbar-search"
                             style="width: 300px;"
                         >
                             <el-button slot="append" icon="el-icon-search" @click="handleSearch"></el-button>
@@ -48,7 +49,7 @@
                 </div>
 
                 <!-- 面包屑导航 -->
-                <div class="breadcrumb">
+                <div class="breadcrumb" aria-label="当前目录路径">
                     <el-breadcrumb separator="/">
                         <el-breadcrumb-item 
                             v-for="(item, index) in breadcrumbItems" 
@@ -1171,7 +1172,7 @@ export default {
                         }
                     } catch (error) {
                         console.error(`${file.name} 上传失败:`, error);
-                        this.closeProgressNotification(fileId, file.name, false, `上传失败: ${error.message}`);
+                        this.closeProgressNotification(fileId, file.name, false, `上传失败: ${this.getUploadErrorMessage(error)}`);
                     }
                 }
                 
@@ -1228,6 +1229,10 @@ export default {
                 this.$message.error(message);
             }
         },
+
+        getUploadErrorMessage(error) {
+            return error?.response?.data?.message || error?.message || '未知错误';
+        },
         
         // 带进度的文件上传
         async uploadFileWithProgress(file, fileMd5, onProgress, token) {
@@ -1259,7 +1264,14 @@ export default {
                             reject(new Error('解析响应失败'));
                         }
                     } else {
-                        reject(new Error(`上传失败: ${xhr.status}`));
+                        let message = `HTTP ${xhr.status}`;
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            message = response.message || message;
+                        } catch (error) {
+                            // 非 JSON 响应使用 HTTP 状态作为兜底提示
+                        }
+                        reject(new Error(message));
                     }
                 });
                 
@@ -1581,7 +1593,7 @@ export default {
 }
 
 .information-body {
-    padding: 2rem 0;
+    padding: 96px 0 2rem;
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -1601,8 +1613,31 @@ export default {
     padding: 1.2rem 2rem;
     background: #f8f9fa;
     border-bottom: 1px solid #e9ecef;
-    flex-wrap: wrap;
-    gap: 1rem;
+    flex-wrap: nowrap;
+    gap: 0.8rem;
+    position: fixed;
+    top: 70px;
+    left: max(2rem, calc((100vw - 1400px) / 2 + 2rem));
+    right: max(2rem, calc((100vw - 1400px) / 2 + 2rem));
+    z-index: 900;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+    height: 76px;
+}
+
+.toolbar-left { display: flex; align-items: center; gap: 0.55rem; min-width: 0; flex: 1 1 auto; overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; white-space: nowrap; scrollbar-width: thin; }
+.toolbar-right { flex: 0 1 300px; min-width: 180px; }
+.toolbar-left .el-button { margin: 0; }
+.toolbar-button { white-space: nowrap; }
+.toolbar-search { max-width: 300px; }
+
+@media (min-width: 1400px) {
+    .toolbar {
+        left: 50%;
+        right: auto;
+        width: calc(1400px - 4rem);
+        transform: translateX(-50%);
+    }
 }
 
 .search-box { flex: 1; max-width: 400px; }
@@ -1628,7 +1663,8 @@ export default {
     font-weight: 500;
 }
 
-.breadcrumb { padding: 0.8rem 2rem; background: #fff; border-bottom: 1px solid #e9ecef; }
+.breadcrumb { padding: 0.8rem 2rem; background: #fff; border-bottom: 1px solid #e9ecef; overflow-x: auto; white-space: nowrap; }
+.breadcrumb ::v-deep .el-breadcrumb { width: max-content; min-width: 100%; }
 .breadcrumb .clickable { cursor: pointer; color: #667eea; transition: color 0.2s ease; }
 .breadcrumb .clickable:hover { color: #764ba2; }
 
@@ -1721,34 +1757,47 @@ export default {
 
 .loading-container { min-height: 200px; display: flex; align-items: center; justify-content: center; }
 
-@media (max-width: 1200px) {
+@media (max-width: 1280px) {
+    .toolbar { padding-left: 1rem; padding-right: 1rem; }
+    .toolbar-left { overflow-x: auto; }
+    .toolbar-button { font-size: 0; min-width: 2.35rem; width: 2.35rem; height: 2.35rem; padding: 0.55rem; }
+    .toolbar-button i { font-size: 1rem; margin: 0; }
+    .toolbar-search { max-width: 240px; }
   .explorer-content { grid-template-columns: 250px 1fr; }
   .grid-view { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
 }
 @media (max-width: 992px) {
-  .information-body { padding: 1.5rem 0; }
+    .information-body { padding: 110px 0 1.5rem; }
   .file-explorer { margin: 0 1rem; }
-  .toolbar { padding: 1rem 1.5rem; }
+    .toolbar { padding: 1rem 1.5rem; left: 1rem; right: 1rem; }
   .breadcrumb { padding: 0.6rem 1.5rem; }
   .explorer-content { grid-template-columns: 220px 1fr; }
   .path-tree, .file-list { padding: 1rem; }
 }
-@media (max-width: 768px) {
-  .information-body { padding: 1rem 0; }
-  .file-explorer { margin: 0 0.5rem; border-radius: 10px; }
-  .toolbar { flex-direction: column; align-items: stretch; gap: 1rem; padding: 1rem 1.2rem; }
+@media (max-width: 767px) {
+    .information-body { padding: 140px 0 1rem; }
+        .file-explorer { margin: 0 0.5rem; border-radius: 10px; }
+        .toolbar { flex-wrap: wrap; align-content: flex-start; top: 60px; left: 0.5rem; right: 0.5rem; height: auto; }
+    .toolbar-left { width: 100%; overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; padding-bottom: 0.15rem; scrollbar-width: thin; }
+    .toolbar-left .toolbar-button { flex: 0 0 auto; }
+    .toolbar-button { font-size: 0; min-width: 2.35rem; width: 2.35rem; height: 2.35rem; padding: 0.55rem; }
+    .toolbar-button i { font-size: 1rem; margin: 0; }
+    .toolbar-right { flex: 0 0 100%; width: 100%; }
+    .toolbar-search { width: 100% !important; max-width: none; }
   .storage-info { padding: 0.8rem 1.2rem; }
   .storage-text { font-size: 0.85rem; }
-  .breadcrumb { padding: 0.6rem 1.2rem; }
-  .explorer-content { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-  .path-tree { border-right: none; border-bottom: 1px solid #e9ecef; }
+    .breadcrumb { padding: 0.6rem 0.8rem; }
+    .storage-info { display: none; }
+    .explorer-content { display: block; min-height: 0; }
+    .path-tree { display: none; }
   .list-header { flex-direction: column; gap: 0.6rem; align-items: stretch; text-align: center; }
 }
 @media (max-width: 480px) {
-  .toolbar { padding: 0.8rem 1rem; }
+    .toolbar { padding: 0.45rem 0.65rem; }
   .storage-info { padding: 0.6rem 1rem; }
   .storage-text { flex-direction: column; gap: 0.3rem; font-size: 0.8rem; }
-  .breadcrumb { padding: 0.5rem 1rem; }
+    .breadcrumb { padding: 0.5rem 0.8rem; }
+    .custom-tree-node .item-count { display: none; }
   .grid-view { grid-template-columns: 1fr; gap: 0.8rem; }
   .item-icon i { font-size: 2.2rem; }
 }
