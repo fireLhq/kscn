@@ -11,49 +11,51 @@ import java.util.List;
  */
 @Mapper
 public interface PublicFileMapper {
+    String FILE_COLUMNS = "public_file.*, (SELECT source_type FROM file_storage s WHERE s.storage_id = public_file.storage_id) AS source_type, (SELECT file_size FROM file_storage s WHERE s.storage_id = public_file.storage_id) AS remote_size, (SELECT size_known FROM file_storage s WHERE s.storage_id = public_file.storage_id) AS size_known";
+
 
     // ==================== 基础查询 ====================
     
     /**
      * 根据ID查询公共文件
      */
-    @Select("SELECT * FROM public_file WHERE file_id = #{fileId}")
+    @Select("SELECT " + FILE_COLUMNS + " FROM public_file WHERE file_id = #{fileId} AND is_deleted = 0")
     PublicFile selectById(@Param("fileId") Long fileId);
 
     /**
      * 根据父ID查询文件列表（不包括已删除）
      */
-    @Select("SELECT * FROM public_file WHERE parent_id <=> #{parentId} AND is_deleted = 0 ORDER BY is_folder DESC, file_name ASC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM public_file WHERE parent_id <=> #{parentId} AND is_deleted = 0 ORDER BY is_folder DESC, file_name ASC")
     List<PublicFile> selectByParentId(@Param("parentId") Long parentId);
 
     /**
      * 根据父ID和文件名查询（检查重名）
      */
-    @Select("SELECT * FROM public_file WHERE parent_id <=> #{parentId} AND file_name = #{fileName} AND is_deleted = 0")
+    @Select("SELECT " + FILE_COLUMNS + " FROM public_file WHERE parent_id <=> #{parentId} AND file_name = #{fileName} AND is_deleted = 0")
     PublicFile selectByParentIdAndName(@Param("parentId") Long parentId, @Param("fileName") String fileName);
 
     /**
      * 查询所有文件（不包括已删除）
      */
-    @Select("SELECT * FROM public_file WHERE is_deleted = 0 ORDER BY create_time DESC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM public_file WHERE is_deleted = 0 ORDER BY create_time DESC")
     List<PublicFile> selectAll();
 
     /**
      * 查询所有文件夹（不包括已删除）
      */
-    @Select("SELECT * FROM public_file WHERE is_folder = 1 AND is_deleted = 0 ORDER BY parent_id, file_name ASC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM public_file WHERE is_folder = 1 AND is_deleted = 0 ORDER BY parent_id, file_name ASC")
     List<PublicFile> selectAllFolders();
 
     /**
      * 根据分类查询公共文件（不包括已删除）
      */
-    @Select("SELECT * FROM public_file WHERE category = #{category} AND is_deleted = 0 AND is_folder = 0 ORDER BY create_time DESC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM public_file WHERE category = #{category} AND is_deleted = 0 AND is_folder = 0 ORDER BY create_time DESC")
     List<PublicFile> selectByCategory(@Param("category") String category);
 
     /**
      * 搜索公共文件（不包括已删除）
      */
-    @Select("SELECT * FROM public_file WHERE file_name LIKE CONCAT('%', #{keyword}, '%') AND is_deleted = 0 ORDER BY create_time DESC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM public_file WHERE file_name LIKE CONCAT('%', #{keyword}, '%') AND is_deleted = 0 ORDER BY create_time DESC")
     List<PublicFile> searchByKeyword(@Param("keyword") String keyword);
 
     // ==================== 插入操作 ====================
@@ -111,7 +113,7 @@ public interface PublicFileMapper {
     /**
      * 获取回收站文件列表
      */
-    @Select("SELECT * FROM public_file WHERE is_deleted = 1 ORDER BY update_time DESC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM public_file WHERE is_deleted = 1 ORDER BY update_time DESC")
     List<PublicFile> selectDeleted();
 
     /**

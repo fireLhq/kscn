@@ -25,6 +25,7 @@ import top.kscn.service.LogService;
 import top.kscn.utils.SecurityContextUtil;
 import top.kscn.utils.JwtUtil;
 import top.kscn.exception.CustomException;
+import top.kscn.exception.DownloadTransferException;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -80,11 +81,14 @@ public class OperationLogAspect {
                     response == null ? 200 : response.getStatus(), detailsJson, request);
             return result;
         } catch (Throwable ex) {
-            String remark = ex.getMessage();
+            DownloadTransferException transfer = DownloadTransferException.find(ex);
+            String remark = transfer == null ? ex.getMessage() : transfer.getMessage();
             if ("LOGIN".equals(operationLog.eventType())) {
                 remark = "登录失败" + (remark == null || remark.isBlank() ? "" : ": " + remark);
             }
-            int status = ex instanceof CustomException customException ? customException.getCode() : 500;
+            Integer status;
+            if (transfer != null) status = response == null ? null : response.getStatus();
+            else status = ex instanceof CustomException customException ? customException.getCode() : 500;
             String detailsJson = buildDetailsJson(joinPoint, operationLog, parameterNames, args, resourceId,
                     resourceName, false, null, ex);
             saveSafely(operationLog, userId, resourceId, resourceName, false, remark, status, detailsJson, request);
@@ -152,6 +156,7 @@ public class OperationLogAspect {
 
     private String asString(Object value) {
         if (value instanceof MultipartFile file) return file.getOriginalFilename();
+        if (value instanceof top.kscn.entity.dto.NetworkFileRequest input) return input.getFileName();
         return value == null ? null : String.valueOf(value);
     }
 
@@ -202,6 +207,15 @@ public class OperationLogAspect {
                 exception.put("type", throwable.getClass().getSimpleName());
                 putIfPresent(exception, "message", throwable.getMessage());
                 details.put("exception", exception);
+                DownloadTransferException transfer = DownloadTransferException.find(throwable);
+                if (transfer != null) {
+                    Map<String, Object> transmission = new LinkedHashMap<>();
+                    transmission.put("outcome", "INTERRUPTED");
+                    transmission.put("reason", transfer.getReason().name());
+                    if (transfer.getBytesWritten() >= 0) transmission.put("bytesWrittenToResponse", transfer.getBytesWritten());
+                    if (transfer.getExpectedBytes() >= 0) transmission.put("expectedResponseBytes", transfer.getExpectedBytes());
+                    details.put("transfer", transmission);
+                }
             }
 
             return objectMapper.writeValueAsString(details);
@@ -295,7 +309,7 @@ public class OperationLogAspect {
     private boolean isSensitiveName(String name) {
         if (name == null) return false;
         String normalized = name.toLowerCase();
-        return normalized.contains("password")
+        return normalized.equals("url") || normalized.equals("remoteurl") || normalized.contains("password")
                 || normalized.contains("token")
                 || normalized.contains("secret")
                 || normalized.contains("captcha")

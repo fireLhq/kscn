@@ -7,36 +7,41 @@ import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import top.kscn.service.IpLocationService;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
 @Service
 public class IpLocationServiceImpl implements IpLocationService {
     private static final Logger log = LoggerFactory.getLogger(IpLocationServiceImpl.class);
 
-    @Value("${geoip.database-path:data/geoip/GeoLite2-City.mmdb}")
+    @Value("${geoip.database-path:classpath:geoip/GeoLite2-City.mmdb}")
     private String databasePath;
 
     private DatabaseReader databaseReader;
 
     @PostConstruct
     public void initialize() {
-        Path path = Path.of(databasePath).toAbsolutePath().normalize();
-        if (!Files.isRegularFile(path)) {
-            log.warn("GeoIP database not found: {}. IP locations will use the original IP.", path);
+        Resource resource = databasePath.startsWith("classpath:") || databasePath.startsWith("file:")
+                ? new DefaultResourceLoader().getResource(databasePath)
+                : new FileSystemResource(databasePath);
+        if (!resource.exists()) {
+            log.warn("GeoIP database not found: {}. IP locations will use the original IP.", databasePath);
             return;
         }
-        try {
-            databaseReader = new DatabaseReader.Builder(path.toFile()).build();
-            log.info("Loaded GeoIP database: {}", path);
+        // Classpath resources inside an executable JAR cannot be converted to ordinary files.
+        try (InputStream input = resource.getInputStream()) {
+            databaseReader = new DatabaseReader.Builder(input).build();
+            log.info("Loaded GeoIP database: {}", databasePath);
         } catch (IOException e) {
-            log.warn("Unable to load GeoIP database: {}", path, e);
+            log.warn("Unable to load GeoIP database: {}", databasePath, e);
         }
     }
 

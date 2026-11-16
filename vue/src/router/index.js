@@ -22,6 +22,30 @@ Vue.use(VueRouter);
 
 const routes = [
     {
+        path: "/service/formulas-and-functions",
+        name: "FormulasAndFunctionsIndex",
+        component: () => import("@/views/system/service/formulas-and-functions/index.vue"),
+        meta: { title: "公式与函数", requiresAuth: false },
+    },
+    {
+        path: "/service/hash-deduplication",
+        name: "HashDeduplicationIndex",
+        component: () => import("@/views/system/service/hash-deduplication/index.vue"),
+        meta: { title: "Hash 文件去重", requiresAuth: false },
+    },
+    {
+        path: "/service/algorithms",
+        name: "AlgorithmIndex",
+        component: () => import("@/views/system/service/algorithm/index.vue"),
+        meta: { title: "算法演示", requiresAuth: false },
+    },
+    {
+        path: "/service/algorithms/:algorithm",
+        name: "AlgorithmDemo",
+        component: () => import("@/views/system/service/algorithm/demo.vue"),
+        meta: { title: "算法演示", requiresAuth: false },
+    },
+    {
         path: "/",
         component: HomeLayout,
         meta: {
@@ -51,7 +75,7 @@ const routes = [
                 name: "Team",
                 component: Team,
                 meta: {
-                    title: "核心人员",
+                    title: "核心团队",
                     requiresAuth: false,
                 },
             },
@@ -69,7 +93,7 @@ const routes = [
                 name: "Notice",
                 component: Notice,
                 meta: {
-                    title: "注意事项",
+                    title: "使用须知",
                     requiresAuth: false,
                 },
             },

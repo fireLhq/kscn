@@ -1,8 +1,8 @@
 <template>
-    <div class="about-view">
+    <div class="about-view home-info-page">
         <div class="about-body">
             <div class="top-bar">
-                <el-button type="text" @click="$router.back()"><i class="el-icon-arrow-left"></i> 返回</el-button>
+                <HomePageReturn />
             </div>
             
             <div class="about-header">
@@ -20,7 +20,7 @@
                         <i class="el-icon-star-on"></i>
                         <div class="notice-content">
                             <h4>开源项目</h4>
-                            <p>本项目完全开源，欢迎访问我们的 GitHub 仓库查看源码、提交问题或参与贡献。你可以自由使用、修改和分发本项目代码</p>
+                            <p>本项目开源，欢迎查看源码、提交问题或参与贡献。使用、修改和分发代码时，请遵循项目许可说明，并保留相关版权与许可声明。</p>
                         </div>
                     </div>
                 </div>
@@ -97,11 +97,11 @@
                 </div>
                 
                 <div class="about-section">
-                    <h2>联系我们</h2>
+                    <h2 id="contact">联系我们</h2>
                     <div class="contact-info">
                         <div class="contact-item">
                             <i class="el-icon-message"></i>
-                            <span>邮箱：lab_c919@qq.com</span>
+                            <span>邮箱：kscn@aliyun.com</span>
                         </div>
                         <div class="contact-item">
                             <i class="el-icon-phone"></i>
@@ -109,11 +109,11 @@
                         </div>
                         <div class="contact-item">
                             <i class="el-icon-location"></i>
-                            <span>地址：重庆市渝中区较场口</span>
+                            <span>地址：Los Angeles, CA</span>
                         </div>
                         <div class="contact-item">
                             <i class="el-icon-chat-dot-round"></i>
-                            <span>Telegram群：<a href="https://t.me/kscn_top" target="_blank">KSCN</a></span>
+                            <span>Telegram群：<a href="https://t.me/kscn_top" target="_blank" rel="noopener noreferrer">KSCN</a></span>
                         </div>
                     </div>
 
@@ -153,8 +153,10 @@
 </template>
 
 <script>
+import HomePageReturn from '@/components/HomePageReturn.vue';
 export default {
     name: "AboutView",
+    components: { HomePageReturn },
     data() {
         return {
             // 页面数据

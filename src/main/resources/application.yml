@@ -29,4 +29,25 @@ operation-log:
   enabled: ${OPERATION_LOG_ENABLED:true}
 
 geoip:
-  database-path: data/geoip/GeoLite2-City.mmdb
+  database-path: classpath:geoip/GeoLite2-City.mmdb
+
+# 网络导入和远程链接：仅允许公开HTTP/HTTPS直链，拒绝内网及特殊端口。
+remote-file:
+  max-import-size: 500MB
+  max-download-size: 2GB
+  max-concurrent-transfers: 4
+  connect-timeout-seconds: 10
+  read-timeout-seconds: 30
+  max-duration-seconds: 600
+  max-redirects: 5
+
+# 下载打包缓存，位于 file.storage-root/temp/downloads。
+download:
+  archive:
+    retention-hours: 24 # 最后一次下载连接结束后继续保留；下载中禁止清理
+    cleanup-interval-ms: 300000 # 每5分钟扫描磁盘，重启后仍能清理残留
+    max-source-size: 1GB # 单次打包原文件总大小（按磁盘实际大小）
+    max-archive-size: 1GB # 单个ZIP实际写入大小，含压缩目录等开销
+    max-cache-size: 10GB # 临时下载目录容量，含并发任务预留空间
+    max-entries: 10000 # 单包文件及目录条目上限
+    max-concurrent-builds: 2 # 同时打包数量，超出时提示稍后重试

@@ -1,15 +1,26 @@
 <template>
-    <div class="notice-view">
+    <div class="notice-view home-info-page">
         <div class="notice-body">
             <div class="top-bar">
-                <el-button type="text" @click="$router.back()"><i class="el-icon-arrow-left"></i> 返回</el-button>
+                <HomePageReturn />
             </div>
             <div class="notice-header">
-                <h1>注意事项</h1>
+                <h1>使用须知</h1>
                 <p class="subtitle">使用KSCN平台前请仔细阅读</p>
             </div>
             
             <div class="notice-content">
+                <div class="notice-section">
+                    <h2>文件使用提示</h2>
+                    <div class="notice-text">
+                        <ul>
+                            <li>公共资源可浏览；上传及个人云盘等功能需要登录后使用。</li>
+                            <li>常见文件支持小于 10 MB 的在线预览；大文件或暂不支持的格式请下载后使用相应软件打开。预览排版可能与原文件不同。</li>
+                            <li>删除的文件进入回收站，保留 7 天；到期或手动永久删除后将无法恢复。重要文件请自行备份。</li>
+                            <li>个人回收站仅本人可用，公共回收站仅管理员可用；个人回收站中的文件仍占用云盘空间。</li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="notice-section">
                     <h2>平台使用规范</h2>
                     <div class="notice-text">
@@ -36,20 +47,20 @@
                 <div class="notice-section">
                     <h2>隐私保护</h2>
                     <div class="notice-text">
-                        <p>我们高度重视用户隐私保护，承诺：</p>
+                        <p>请妥善保管账号和个人资料，留意以下说明：</p>
                         
                         <h3>信息收集</h3>
                         <ul>
                             <li>仅收集必要的用户信息，用于平台功能实现</li>
                             <li>不会向第三方出售、出租或泄露用户个人信息</li>
-                            <li>采用加密技术保护用户数据安全</li>
+                            <li>平台会记录必要的访问与操作日志，用于故障排查和安全管理</li>
                         </ul>
                         
                         <h3>信息使用</h3>
                         <ul>
                             <li>用户信息仅用于平台服务，不会用于其他商业目的</li>
                             <li>在获得用户明确同意前，不会向第三方分享信息</li>
-                            <li>用户可随时查看、修改或删除个人信息</li>
+                            <li>可在个人中心查看和修改已支持编辑的资料；其他资料处理需求请联系团队</li>
                         </ul>
                     </div>
                 </div>
@@ -82,39 +93,28 @@
                         
                         <h3>用户内容版权</h3>
                         <ul>
-                            <li>用户保留其发布内容的完整版权</li>
+                            <li>内容版权归原权利人所有，上传或分享前请确认拥有相应权限</li>
                             <li>用户授权平台在服务范围内使用其内容</li>
-                            <li>用户可随时撤回授权或删除已发布内容</li>
+                            <li>可按权限删除自己上传的内容；删除不会撤回其他用户已下载的副本</li>
                         </ul>
                         
                         <h3>平台内容版权</h3>
                         <ul>
-                            <li>平台界面设计、功能代码等归平台所有</li>
-                            <li>未经许可，不得复制、修改或商业使用</li>
+                            <li>项目代码的使用、修改和分发请遵循仓库中的开源许可说明</li>
+                            <li>代码许可不代表对用户上传内容、第三方图片或商标的使用授权</li>
                             <li>开源组件遵循相应的开源协议</li>
                         </ul>
                     </div>
                 </div>
                 
-                <div class="notice-section">
-                    <h2>联系我们</h2>
-                    <div class="contact-info">
-                        <p>如果您对以上注意事项有任何疑问，或者发现平台存在违规行为，请及时联系我们：</p>
-                        <div class="contact-details">
-                            <p><strong>举报邮箱：</strong>lab_c919@qq.com</p>
-                            <p><strong>Telegram：</strong>191-2268-5314</p>
-                            <p><strong>工作时间：</strong>周一至周五 9:00-18:00</p>
-                        </div>
-                        <p class="note">我们会在收到反馈后尽快处理，感谢您的理解与支持！</p>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-export default { name: "NoticeView" };
+import HomePageReturn from '@/components/HomePageReturn.vue';
+export default { name: "NoticeView", components: { HomePageReturn } };
 </script>
 
 <style scoped>

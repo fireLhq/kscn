@@ -1,17 +1,17 @@
 <template>
-    <div class="team-view">
+    <div class="team-view home-info-page">
         <div class="team-body">
             <div class="top-bar">
-                <el-button type="text" @click="$router.back()"><i class="el-icon-arrow-left"></i> 返回</el-button>
+                <HomePageReturn />
             </div>
             <div class="team-header">
-                <h1>核心人员</h1>
+                <h1>核心团队</h1>
                 <p class="subtitle">KSCN项目的核心开发团队</p>
             </div>
             
             <div class="team-content">
                 <div v-if="loading" class="loading-container">
-                    <el-loading :loading="true" text="加载团队成员中..."></el-loading>
+                    <span role="status"><i class="el-icon-loading" aria-hidden="true"></i> 加载团队成员中...</span>
                 </div>
                 
                 <div v-else class="team-section">
@@ -58,27 +58,18 @@
                     </div>
                 </div>
                 
-                <div class="team-section">
-                    <h2>加入我们</h2>
-                    <div class="join-us">
-                        <p>我们正在寻找优秀的开发者和管理者加入团队。如果你对知识共享、开源项目或技术创新充满热情，欢迎联系我们！</p>
-                        <div class="contact-info">
-                            <p><strong>联系方式：</strong></p>
-                            <p>Telegram群：<a href="https://t.me/kscn_top" target="_blank">KSCN</a></p>
-                            <p>邮箱：lab_c919@qq.com</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import HomePageReturn from '@/components/HomePageReturn.vue';
 import { getMemberPage, getMemberAvatarUrl } from "@/api/system/member";
 
 export default {
     name: "TeamView",
+    components: { HomePageReturn },
     data() {
         return {
             developers: [],

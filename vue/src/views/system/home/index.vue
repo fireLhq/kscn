@@ -169,6 +169,8 @@
             :visible.sync="popupVisible"
             width="620px"
             custom-class="home-message-dialog"
+            append-to-body
+            :modal-fade="false"
             :close-on-click-modal="false"
             :show-close="true"
             @close="handlePopupClose"
@@ -248,7 +250,7 @@ export default {
             return `${this.popupIndex + 1}/${this.popupMessages.length}`;
         },
     },
-    async created() {
+    async mounted() {
         await this.initHomeData();
     },
     methods: {
@@ -292,12 +294,15 @@ export default {
         async fetchPopupMessages() {
             try {
                 const res = await getActivePopupMessages({ browserId: this.browserId });
+                // A response from a previous visit must not reopen its dialog.
+                if (this._isDestroyed || this._isBeingDestroyed) return;
                 if (res.data.code === 200) {
                     this.popupMessages = Array.isArray(res.data.data) ? res.data.data : [];
                     this.popupIndex = 0;
                     this.popupVisible = this.popupMessages.length > 0;
                 }
             } catch (error) {
+                if (this._isDestroyed || this._isBeingDestroyed) return;
                 this.popupMessages = [];
                 this.popupVisible = false;
             }

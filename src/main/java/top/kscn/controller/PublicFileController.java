@@ -222,6 +222,7 @@ public class PublicFileController {
      * 彻底删除文件
      */
     @DeleteMapping("/delete/permanent")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLog(eventType = "FILE", action = "PERMANENT_DELETE", resourceType = "PUBLIC_FILE", resourceIdParam = "fileId")
     public Result<?> permanentDeleteFile(@RequestParam Long fileId) {
         publicFileService.permanentDeleteFile(fileId);
@@ -313,6 +314,7 @@ public class PublicFileController {
      * 获取回收站文件列表
      */
     @GetMapping("/recycle")
+    @PreAuthorize("hasRole('ADMIN')")
     public Result<List<PublicFile>> getRecycleBin() {
         List<PublicFile> files = publicFileService.getRecycleBin();
         return Result.success("获取回收站列表成功", files);
@@ -322,6 +324,7 @@ public class PublicFileController {
      * 恢复文件
      */
     @PutMapping("/recycle/restore")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLog(eventType = "FILE", action = "RESTORE", resourceType = "PUBLIC_FILE", resourceIdParam = "fileId")
     public Result<?> restoreFile(@RequestParam Long fileId) {
         publicFileService.restoreFile(fileId);
@@ -332,6 +335,7 @@ public class PublicFileController {
      * 清空回收站
      */
     @DeleteMapping("/recycle/empty")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLog(eventType = "FILE", action = "EMPTY_RECYCLE_BIN", resourceType = "PUBLIC_FILE")
     public Result<?> emptyRecycleBin() {
         publicFileService.emptyRecycleBin();

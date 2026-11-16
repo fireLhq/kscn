@@ -4,7 +4,7 @@
             <div class="file-explorer">
                 <!-- 顶部工具栏 -->
                 <div class="toolbar">
-                    <div class="toolbar-left">
+                    <div class="toolbar-left" v-if="!showRecycleBin">
                         <el-button class="toolbar-button root-button" title="返回根目录" @click="goToRoot" :disabled="isAtRoot">
                             <i class="el-icon-house"></i> 返回根目录
                         </el-button>
@@ -17,25 +17,17 @@
                         <el-button class="toolbar-button" title="新建文件夹" @click="createFolder">
                             <i class="el-icon-folder-add"></i> 新建文件夹
                         </el-button>
-                        <el-button class="toolbar-button"
-                            @click="batchDownload" 
-                            :disabled="!hasSelectedItems"
-                            type="success"
-                        >
-                            <i class="el-icon-download"></i> 批量下载
-                        </el-button>
-                        <el-button class="toolbar-button"
-                            @click="batchDelete" 
-                            :disabled="!hasSelectedItems"
-                            type="danger"
-                        >
-                            <i class="el-icon-delete"></i> 批量删除
-                        </el-button>
                         <el-button class="toolbar-button" title="刷新" @click="refreshAll" type="info">
                             <i class="el-icon-refresh"></i> 刷新
                         </el-button>
                     </div>
-                    <div class="toolbar-right">
+                    <div class="toolbar-left" v-else>
+                        <el-button class="toolbar-button" title="返回我的云盘" @click="leaveRecycleBin"><i class="el-icon-folder-opened"></i> 返回我的云盘</el-button>
+                        <el-button class="toolbar-button" title="恢复选中" type="primary" :disabled="recycleState.busy || !recycleState.selected" @click="$refs.recycleBin.restoreSelected()"><i class="el-icon-refresh-left"></i> 恢复选中</el-button>
+                        <el-button class="toolbar-button" title="清空回收站" type="danger" :disabled="recycleState.busy || !recycleState.total" @click="$refs.recycleBin.empty()"><i class="el-icon-delete"></i> 清空回收站</el-button>
+                        <el-button class="toolbar-button" title="刷新" type="info" :disabled="recycleState.busy" @click="$refs.recycleBin.load()"><i class="el-icon-refresh"></i> 刷新</el-button>
+                    </div>
+                    <div class="toolbar-right" v-show="!showRecycleBin">
                         <el-input
                             v-model="searchQuery"
                             placeholder="搜索文件或文件夹..."
@@ -49,7 +41,7 @@
                 </div>
 
                 <!-- 面包屑导航 -->
-                <div class="breadcrumb" aria-label="当前目录路径">
+                <div class="breadcrumb" aria-label="当前目录路径" v-show="!showRecycleBin">
                     <el-breadcrumb separator="/">
                         <el-breadcrumb-item 
                             v-for="(item, index) in breadcrumbItems" 
@@ -77,7 +69,7 @@
                     <div class="path-tree">
                         <h3>目录结构</h3>
                         <el-tree
-                            :data="treeData"
+                            :data="navigationTreeData"
                             :props="treeProps"
                             @node-click="handleTreeNodeClick"
                             @node-expand="handleNodeExpand"
@@ -104,7 +96,8 @@
                     </div>
 
                     <!-- 右侧文件列表 -->
-                    <div class="file-list">
+                    <RecycleBinPanel ref="recycleBin" v-if="showRecycleBin" @toolbar-state="recycleState = $event" @changed="refreshAfterRecycleChange" />
+                    <div class="file-list" v-else @contextmenu.prevent="onFileContextMenu($event)">
                         <div class="list-header">
                             <h3>文件列表</h3>
                             <div class="view-options">
@@ -154,6 +147,7 @@
                                 class="grid-item"
                                 :class="{ 'selected': isSelected(item) }"
                                 @click="handleItemClick(item)"
+                                @contextmenu.stop.prevent="onFileContextMenu($event, item)"
                             >
                                 <div class="item-checkbox">
                                     <el-checkbox 
@@ -162,54 +156,18 @@
                                         @click.native.stop
                                     ></el-checkbox>
                                 </div>
-                                <div class="item-icon">
+                                <div class="item-icon"><span class="file-source-icon">
                                     <img 
                                         :src="getIconPath(getItemIcon(item))" 
                                         :alt="item.name"
                                         class="file-icon"
-                                    />
-                                </div>
+                                    /><i v-if="item.remote" class="el-icon-cloudy remote-file-badge" title="远程链接" aria-label="远程链接"></i></span></div>
                                 <div class="item-name">{{ item.name }}</div>
                                 <div class="item-info">
-                                    <span v-if="item.type === 'file'">{{ formatFileSize(item.size) }}</span>
+                                    <span v-if="item.type === 'file'">{{ item.remote && item.size == null ? '大小未知' : formatFileSize(item.size) }}</span>
                                     <span v-else>{{ item.itemCount }} 项</span>
                                 </div>
-                                <div class="item-actions">
-                                    <el-button 
-                                        size="mini" 
-                                        type="text" 
-                                        @click.stop="downloadItem(item)" 
-                                        v-if="item.type === 'file'"
-                                        title="下载文件"
-                                    >
-                                        <i class="el-icon-download"></i>
-                                    </el-button>
-                                    <el-button 
-                                        size="mini" 
-                                        type="text" 
-                                        @click.stop="downloadFolder(item)" 
-                                        v-if="item.type === 'folder'"
-                                        title="下载文件夹"
-                                    >
-                                        <i class="el-icon-download"></i>
-                                    </el-button>
-                                    <el-button 
-                                        size="mini" 
-                                        type="text" 
-                                        @click.stop="renameItem(item)"
-                                        title="重命名"
-                                    >
-                                        <i class="el-icon-edit"></i>
-                                    </el-button>
-                                    <el-button 
-                                        size="mini" 
-                                        type="text" 
-                                        @click.stop="deleteItem(item)"
-                                        title="删除"
-                                    >
-                                        <i class="el-icon-delete"></i>
-                                    </el-button>
-                                </div>
+                                <FileItemActions :item="item" @action="handleFileItemAction" />
                             </div>
                         </div>
 
@@ -219,17 +177,18 @@
                                 :data="displayItems" 
                                 style="width: 100%"
                                 @selection-change="handleSelectionChange"
+                                @row-contextmenu="onFileRowContextMenu"
                                 ref="fileTable"
                             >
                                 <el-table-column type="selection" width="55"></el-table-column>
                                 <el-table-column prop="name" label="名称" min-width="200">
                                     <template slot-scope="scope">
                                         <div @click="handleItemClick(scope.row)" style="cursor: pointer;">
-                                            <img 
+                                            <span class="file-source-icon file-source-icon-small"><img
                                                 :src="getIconPath(getItemIcon(scope.row))" 
                                                 :alt="scope.row.name"
                                                 class="file-icon-small"
-                                            />
+                                            /><i v-if="scope.row.remote" class="el-icon-cloudy remote-file-badge" title="远程链接"></i></span>
                                             {{ scope.row.name }}
                                         </div>
                                     </template>
@@ -241,7 +200,7 @@
                                 </el-table-column>
                                 <el-table-column prop="size" label="大小" width="120">
                                     <template slot-scope="scope">
-                                        <span v-if="scope.row.type === 'file'">{{ formatFileSize(scope.row.size) }}</span>
+                                        <span v-if="scope.row.type === 'file'">{{ scope.row.remote && scope.row.size == null ? '大小未知' : formatFileSize(scope.row.size) }}</span>
                                         <span v-else>{{ scope.row.itemCount }} 项</span>
                                     </template>
                                 </el-table-column>
@@ -289,8 +248,15 @@
             width="600px"
             :close-on-click-modal="false"
             :before-close="handleUploadDialogClose"
+            :close-on-press-escape="!networkUploadBusy" :show-close="!networkUploadBusy"
         >
-            <div class="upload-content">
+            <el-tabs v-model="uploadMode">
+                <el-tab-pane label="本地上传" name="LOCAL" :disabled="networkUploadBusy" />
+                <el-tab-pane label="网络导入" name="IMPORT" :disabled="networkUploadBusy" />
+                <el-tab-pane label="远程链接" name="LINK" :disabled="networkUploadBusy" />
+            </el-tabs>
+            <NetworkFileUpload v-if="uploadMode !== 'LOCAL'" :public-space="false" :mode="uploadMode" :parent-id="currentParentId" @busy="networkUploadBusy = $event" @changed="onNetworkFileAdded" />
+            <div v-if="uploadMode === 'LOCAL'" class="upload-content">
                 <el-upload
                     ref="upload"
                     :auto-upload="false"
@@ -309,8 +275,8 @@
                 </el-upload>
             </div>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="showUploadDialog = false">取消</el-button>
-                <el-button type="primary" @click="confirmUpload">确认上传</el-button>
+                <el-button :disabled="networkUploadBusy" @click="handleUploadDialogClose()">取消</el-button>
+                <el-button v-if="uploadMode === 'LOCAL'" type="primary" @click="confirmUpload">确认上传</el-button>
             </span>
         </el-dialog>
 
@@ -351,10 +317,16 @@
             </span>
         </el-dialog>
 
+        <FileOperations v-if="!showRecycleBin" ref="fileOperations"  :selected-items="selectedItems" :current-parent-id="currentParentId"
+            @select-all="selectAllFiles" @clear-selection="clearFileSelection" @request="handleFileMenuRequest" @item-action="handleFileItemAction" @changed="refreshAfterFileOperation" />
     </div>
 </template>
 
 <script>
+import fileOperations from "@/mixins/file-operations";
+import directoryNavigation from "@/mixins/directory-navigation";
+import fileToolbarLayout from "@/mixins/file-toolbar-layout";
+import RecycleBinPanel from "@/components/RecycleBinPanel.vue";
 import { getFileIconName, getFileIconPath } from "@/utils/file-icons";
 import { 
     listFiles,
@@ -380,9 +352,12 @@ import {
 } from "@/api/system/user-files";
 
 export default {
+    mixins: [fileOperations, directoryNavigation, fileToolbarLayout],
+    components: { RecycleBinPanel },
     name: "UserFilesView",
     data() {
         return {
+            recycleState: { busy: true, selected: 0, total: 0 },
             searchQuery: "",
             viewMode: "grid",
             currentParentId: null, // 当前文件夹ID
@@ -431,6 +406,10 @@ export default {
         };
     },
     computed: {
+        showRecycleBin() { return this.$route.query.view === "recycle"; },
+        navigationTreeData() {
+            return  [...this.treeData, { id: null, label: "回收站", path: "recycle", type: "recycle" }];
+        },
         breadcrumbItems() {
             return [
                 { name: "我的云盘", id: null },
@@ -486,6 +465,19 @@ export default {
         }
     },
     watch: {
+        showRecycleBin: {
+            immediate: true,
+            handler(active) {
+                this.$nextTick(() => {
+                    if (active) {
+                        this.currentTreeNodeKey = "recycle";
+                        if (this.$refs.tree) this.$refs.tree.setCurrentKey("recycle");
+                    } else {
+                        this.updateTreeHighlight();
+                    }
+                });
+            },
+        },
         viewMode(newMode, oldMode) {
             // 当切换视图时，同步选中状态
             this.$nextTick(() => {
@@ -505,6 +497,21 @@ export default {
         await this.loadCurrentDirectory();
     },
     methods: {
+        toggleRecycleBin() {
+            if (this.showRecycleBin) return;
+            this.$router.push({ path: this.$route.path, query: { ...this.$route.query, view: "recycle" } });
+        },
+        leaveRecycleBin() {
+            if (this.$route.query.view !== "recycle") return;
+            const query = { ...this.$route.query };
+            delete query.view;
+            this.$router.push({ path: this.$route.path, query });
+        },
+        async refreshAfterRecycleChange() {
+            await this.loadDirectoryTree(true);
+            await this.loadCurrentDirectory();
+            await this.loadSpaceInfo();
+        },
         // 加载空间信息
         async loadSpaceInfo() {
             try {
@@ -546,34 +553,17 @@ export default {
                         children: response.data.data
                     }];
                     
-                    // 恢复展开状态
-                    if (preserveExpandState && savedExpandedKeys.length > 0) {
-                        this.$nextTick(() => {
-                            this.expandedKeys = savedExpandedKeys;
-                        });
-                    } else {
-                        // 确保当前路径的所有父级目录都展开
-                        this.ensureCurrentPathExpanded();
-                    }
+                    await this.restoreDirectoryTreeState(savedExpandedKeys);
+                    return true;
                 } else {
                     console.error("加载目录树失败:", response.data.message);
-                    this.treeData = [{
-                        id: null,
-                        label: "我的云盘",
-                        path: "root",
-                        type: "folder",
-                        children: []
-                    }];
+                    this.$message.error(response.data.message || "加载目录树失败，请重试");
+                    return false;
                 }
             } catch (error) {
                 console.error("加载目录树失败:", error);
-                this.treeData = [{
-                    id: null,
-                    label: "我的云盘",
-                    path: "root",
-                    type: "folder",
-                    children: []
-                }];
+                this.$message.error("加载目录树失败，请重试");
+                return false;
             }
         },
         
@@ -633,7 +623,8 @@ export default {
                         id: item.fileId,
                         name: item.fileName,
                         type: item.isFolder === 1 ? 'folder' : 'file',
-                        size: item.fileSize,
+                        size: item.remote ? (item.sizeKnown ? item.remoteSize : null) : item.fileSize,
+                        remote: !!item.remote,
                         modifiedTime: item.updateTime,
                         itemCount: item.itemCount || 0, // 使用后端返回的项数
                         storageId: item.storageId
@@ -735,7 +726,8 @@ export default {
                         id: item.fileId,
                         name: item.fileName,
                         type: item.isFolder === 1 ? 'folder' : 'file',
-                        size: item.fileSize,
+                        size: item.remote ? (item.sizeKnown ? item.remoteSize : null) : item.fileSize,
+                        remote: !!item.remote,
                         modifiedTime: item.updateTime,
                         itemCount: item.itemCount || 0, // 使用后端返回的项数
                         storageId: item.storageId,
@@ -848,6 +840,8 @@ export default {
         
         // 树节点点击
         handleTreeNodeClick(data) {
+            if (data.path === "recycle") { if (!this.showRecycleBin) this.toggleRecycleBin(); return; }
+            this.leaveRecycleBin();
             this.exitSearchMode();
             this.selectedItems = [];
             this.currentParentId = data.id;
@@ -1087,9 +1081,16 @@ export default {
         handleExceed(files, fileList) {
             this.$message.warning(`当前限制选择 50 个文件`);
         },
-        handleUploadDialogClose() {
-            this.$refs.upload.clearFiles();
-            this.showUploadDialog = false;
+        handleUploadDialogClose(done) {
+            if (this.networkUploadBusy) { this.$message.warning('网络文件正在处理中，请稍候'); return; }
+            if (this.$refs.upload) {
+                this.$refs.upload.clearFiles();
+            }
+            if (typeof done === 'function') {
+                done();
+            } else {
+                this.showUploadDialog = false;
+            }
         },
         async confirmUpload() {
             try {
@@ -1383,6 +1384,10 @@ export default {
         
         // 批量下载
         async batchDownload() {
+            if (this.selectedItems.some(item => item.remote)) {
+                this.$message.warning('远程链接暂不支持ZIP打包，请单独下载或先网络导入');
+                return;
+            }
             if (this.selectedItems.length === 0) {
                 this.$message.warning("请选择要下载的文件");
                 return;
@@ -1494,28 +1499,15 @@ export default {
         
         // 下载文件夹
         async downloadFolder(folder) {
+            const loading = this.$loading({ lock: true, text: '正在检查并打包文件夹...' });
             try {
                 const token = this.$store.state.token;
-                
-                // 显示加载提示
-                const loading = this.$loading({
-                    lock: true,
-                    text: '正在打包文件夹，请稍候...',
-                    spinner: 'el-icon-loading',
-                    background: 'rgba(0, 0, 0, 0.7)'
-                });
-                
-                // 延迟一下再下载，让后端有时间打包
-                setTimeout(() => {
-                    loading.close();
-                    this.$message.success('开始下载');
-                    downloadFolder(folder.id, token);
-                }, 1000);
-                
+                const prepared = await createBatchDownloadTask([folder.id], token);
+                if (prepared.data.code !== 200) throw new Error(prepared.data.message);
+                downloadFolder(folder.id, token);
             } catch (error) {
-                console.error("下载文件夹失败:", error);
-                this.$message.error("下载文件夹失败，请重试");
-            }
+                this.$message.error(error.response?.data?.message || error.message || '文件夹无法打包');
+            } finally { loading.close(); }
         },
         
         // 刷新
@@ -1525,7 +1517,7 @@ export default {
                 this.selectedItems = [];
                 this.exitSearchMode();
                 
-                await this.loadDirectoryTree();
+                if (await this.loadDirectoryTree(true) === false) return;
                 await this.loadCurrentDirectory();
                 await this.loadSpaceInfo();
                 this.$message.success("刷新成功");
@@ -1555,8 +1547,9 @@ export default {
         // 同步表格选中状态
         syncTableSelection() {
             if (this.$refs.fileTable) {
+                const selectedItems = [...this.selectedItems];
                 this.$refs.fileTable.clearSelection();
-                this.selectedItems.forEach(selectedItem => {
+                selectedItems.forEach(selectedItem => {
                     const row = this.displayItems.find(item => item.id === selectedItem.id);
                     if (row) {
                         this.$refs.fileTable.toggleRowSelection(row, true);
@@ -1587,6 +1580,10 @@ export default {
 </script>
 
 <style scoped>
+.file-source-icon { display: inline-block; position: relative; line-height: 0; vertical-align: middle; }
+.file-source-icon .remote-file-badge { position: absolute; right: -4px; bottom: -2px; font-size: 16px; line-height: 18px; width: 20px; height: 18px; color: #409eff; background: #fff; border-radius: 8px; text-align: center; box-shadow: 0 0 2px #aaa; }
+.file-source-icon-small .remote-file-badge { right: -3px; bottom: -1px; font-size: 11px; width: 14px; height: 13px; line-height: 13px; }
+
 .information-view {
     min-height: 100vh;
     background-color: #f8f9fa;
@@ -1633,7 +1630,7 @@ export default {
 
 @media (min-width: 1400px) {
     .toolbar {
-        left: 50%;
+        left: calc(50% - var(--file-body-padding-right, 0px) / 2);
         right: auto;
         width: calc(1400px - 4rem);
         transform: translateX(-50%);
@@ -1701,6 +1698,9 @@ export default {
 .item-info { color: #7f8c8d; font-size: 0.85rem; }
 
 .item-actions {
+    max-width: calc(100% - 2.5rem);
+    flex-wrap: wrap;
+    justify-content: flex-end;
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;

@@ -1,8 +1,8 @@
 <template>
-    <div class="sponsor-view">
+    <div class="sponsor-view home-info-page">
         <div class="sponsor-body">
             <div class="top-bar">
-                <el-button type="text" @click="$router.back()"><i class="el-icon-arrow-left"></i> 返回</el-button>
+                <HomePageReturn />
             </div>
             <div class="sponsor-header">
                 <h1>赞助支持</h1>
@@ -68,7 +68,7 @@
                                 <img src="@/assets/images/system/home/subpages/sponsor/PayPal.svg" alt="PayPal" />
                             </div>
                             <h3>PayPal</h3>
-                            <p>Use PayPal to scan and pay</p>
+                            <p>使用 PayPal 扫码支持</p>
                             <div class="qr-code">
                                 <img src="@/assets/images/system/home/subpages/sponsor/PayPal二维码.jpg" alt="PayPal二维码" />
                             </div>
@@ -101,7 +101,8 @@
                 </div>
                 
                 <div class="sponsor-section">
-                    <h2>赞助等级</h2>
+                    <h2>支持参考</h2>
+                    <p style="margin-bottom: 24px; color: #6c757d">赞助完全自愿，金额不限。以下档位仅供参考，不影响平台的正常使用。</p>
                     <div class="sponsor-levels">
                         <div class="sponsor-level">
                             <div class="level-header bronze">
@@ -161,26 +162,16 @@
                     </div>
                 </div>
                 
-                <div class="sponsor-section">
-                    <h2>联系我们</h2>
-                    <div class="contact-info">
-                        <p>如果您有任何赞助相关的问题，或者希望了解更详细的赞助方案，请随时联系我们：</p>
-                        <div class="contact-details">
-                            <p><strong>邮箱：</strong>lab_c919@qq.com</p>
-                            <p><strong>QID：</strong>AirC919</p>
-                            <p><strong>微信：</strong>DiracEq</p>
-                            <p><strong>Telegram：</strong>191-2268-5314</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import HomePageReturn from '@/components/HomePageReturn.vue';
 export default {
     name: "SponsorView",
+    components: { HomePageReturn },
 };
 </script>
 

@@ -1,6 +1,7 @@
 package top.kscn.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import top.kscn.common.Result;
 
 import java.net.ConnectException;
@@ -25,6 +27,18 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // The response connection is unusable: do not write a JSON body or invent a new HTTP status.
+    @ExceptionHandler({DownloadTransferException.class, AsyncRequestNotUsableException.class})
+    public void handleDownloadTransferException(Exception exception, HttpServletRequest request) {
+        DownloadTransferException transfer = DownloadTransferException.find(exception);
+        if (transfer != null && transfer.getReason() == DownloadTransferException.Reason.WRITE_TIMEOUT) {
+            log.warn("[下载] 响应写出超时，连接已结束，可重试或续传: {}，已写出={}/{}", request.getRequestURI(), transfer.getBytesWritten(), transfer.getExpectedBytes());
+        } else {
+            log.debug("[下载] 响应连接已中断: {}", request.getRequestURI());
+        }
+        log.trace("下载传输中断详情", exception);
+    }
 
     /**
      * 业务异常
@@ -131,8 +145,9 @@ public class GlobalExceptionHandler {
      * 兜底异常（最后一道防线）
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Result<?>> handleException(Exception e) {
+    public ResponseEntity<Result<?>> handleException(Exception e, jakarta.servlet.http.HttpServletResponse response) {
         log.error("[系统] 未知异常", e);
+        if (response.isCommitted()) return null; // Streaming has started; a JSON error would corrupt the file body.
         return ResponseEntity
                 .status(500)
                 .body(Result.error(500, "系统异常，请稍后重试"));

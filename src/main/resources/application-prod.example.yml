@@ -38,6 +38,3 @@ cookie:
 
 operation-log:
   enabled: true  # 是否记录注解标记的用户和文件操作日志
-
-geoip:
-  database-path: /kscn/data/geoip/GeoLite2-City.mmdb  # 服务器上的 GeoLite2-City.mmdb 路径

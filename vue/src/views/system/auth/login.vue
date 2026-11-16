@@ -1,6 +1,6 @@
 <template>
     <div class="login">
-            <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
+            <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" @submit.native.prevent="handleLogin">
                 <h2 class="title">登录KSCN系统</h2>
                 <div class="icon">
                 <img src="@/assets/images/system/auth/login/icon.svg" alt="icon" />
@@ -15,7 +15,7 @@
                 </el-form-item>
 
                 <el-form-item>
-                    <el-button type="primary" @click.prevent="handleLogin" class="login-btn" :loading="loading"> 登录 </el-button>
+                    <el-button type="primary" native-type="submit" class="login-btn" :loading="loading"> 登录 </el-button>
                 </el-form-item>
 
                 <div class="links">
@@ -60,8 +60,9 @@ export default {
     methods: {
         // 登录
         async handleLogin() {
+            if (this.loading) return;
             this.$refs.loginForm.validate(async (valid) => {
-                if (valid) {
+                if (valid && !this.loading) {
                     this.loading = true;
                     try {
                         const response = await postAuthLogin(this.loginForm);

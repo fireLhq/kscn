@@ -7,6 +7,17 @@ import java.time.LocalDateTime;
  * 存储真实的物理文件信息，通过MD5去重
  */
 public class FileStorage {
+    private String sourceType = "LOCAL";
+    private String remoteUrl;
+    private Boolean sizeKnown = true;
+    public String getSourceType() { return sourceType; }
+    public void setSourceType(String value) { sourceType = value; }
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    public String getRemoteUrl() { return remoteUrl; }
+    public void setRemoteUrl(String value) { remoteUrl = value; }
+    public Boolean getSizeKnown() { return sizeKnown; }
+    public void setSizeKnown(Boolean value) { sizeKnown = value; }
+    public boolean isRemote() { return "REMOTE".equals(sourceType); }
     private Long storageId;          // 物理文件ID
     private String fileMd5;          // 文件MD5唯一标识
     private Long fileSize;           // 文件大小（字节）

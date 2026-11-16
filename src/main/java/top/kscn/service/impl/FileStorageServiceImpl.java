@@ -33,6 +33,11 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Autowired
     private FileStorageMapper fileStorageMapper;
 
+    @Autowired
+    private top.kscn.service.StorageGarbageCollector garbageCollector;
+    @Autowired
+    private top.kscn.service.RemoteFileAccess remoteFiles;
+
     @Value("${file.storage-root}")
     private String storageRoot;
 
@@ -81,8 +86,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Override
     @Transactional
     public int incrementRefCount(Long storageId) {
-        FileStorage storage = fileStorageMapper.selectById(storageId);
-        if (storage == null) {
+        FileStorage storage = fileStorageMapper.lockById(storageId);
+        if (storage == null || storage.getStatus() != 1) {
             throw new CustomException(404, "物理文件不存在");
         }
         
@@ -93,28 +98,28 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Override
     @Transactional
     public int decrementRefCount(Long storageId) {
-        FileStorage storage = fileStorageMapper.selectById(storageId);
+        FileStorage storage = fileStorageMapper.lockById(storageId);
         if (storage == null) {
             return -1;
         }
-        
-        int newRefCount = storage.getRefCount() - 1;
-        
-        if (newRefCount <= 0) {
-            // 引用计数为0，删除物理文件
-            try {
-                Files.deleteIfExists(Paths.get(storage.getFilePath()));
-            } catch (IOException e) {
-                // 记录日志但不抛出异常
-                System.err.println("删除物理文件失败: " + storage.getFilePath());
-            }
-            fileStorageMapper.deleteIfNoRef(storageId);
-            return -1;
-        } else {
-            // 更新引用计数
-            fileStorageMapper.decrementRefCount(storageId);
-            return newRefCount;
+        // 必须在逻辑文件记录删除后调用，包含回收站中的所有引用。
+        int references = fileStorageMapper.countActualReferences(storageId);
+        fileStorageMapper.setReferences(storageId, references, references == 0 ? 0 : 1);
+        if (references == 0) {
+            org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                    new org.springframework.transaction.support.TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            try {
+                                garbageCollector.collect(storageId);
+                            } catch (Exception exception) {
+                                System.err.println("物理文件清理将在定时任务中重试: " + storageId);
+                            }
+                        }
+                    });
         }
+        // 这里只标记待清理，磁盘删除在提交后的独立事务中执行，回滚不会丢失源文件。
+        return references;
     }
 
     // ==================== 文件上传 ====================
@@ -335,6 +340,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             return;
         }
 
+        if (storage.isRemote()) { remoteFiles.download(storage, fileName, range, response); return; }
         File physicalFile = new File(storage.getFilePath());
         if (!physicalFile.exists()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "物理文件不存在");

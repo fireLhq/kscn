@@ -1,0 +1,82 @@
+.algorithm-page { min-height: 100vh; background: #f8f9fa; color: #223248; }
+.algorithm-page .algorithm-container { max-width: 1400px; margin: 0 auto; padding: 28px 2rem 64px; box-sizing: border-box; }
+.algorithm-page .back-link { display: inline-flex; align-items: center; gap: 6px; padding: 10px 0; border: 0; background: transparent; color: #62758b; text-decoration: none; font-family: inherit; font-size: 14px; line-height: inherit; cursor: pointer; }
+.algorithm-page .back-link:hover { color: #667eea; }
+.algorithm-page .back-link:focus-visible { outline: 2px solid #667eea; outline-offset: 3px; }
+.algorithm-page .algorithm-header { margin: 24px 0 36px; text-align: center; }
+.algorithm-page .eyebrow { color: #667eea; font-size: 12px; font-weight: 700; letter-spacing: .2em; }
+.algorithm-page .algorithm-header h1 { margin: 12px 0; font-size: 2.45rem; line-height: 1.3; }
+.algorithm-page .algorithm-header p { margin: 0; color: #6b7d92; line-height: 1.8; }
+.algorithm-page .source-credit { margin: 36px 0 0; color: #8794a6; font-size: 12px; line-height: 1.8; text-align: center; }
+.algorithm-page .source-credit a { color: #6576c6; text-decoration: none; }
+.algorithm-page .source-credit a:hover { text-decoration: underline; }
+.algorithm-page .empty-state { padding: 60px 20px; border: 1px solid #dfe6f0; border-radius: 20px; background: #fff; color: #6b7d92; text-align: center; }
+@media (max-width: 768px) { .algorithm-page .algorithm-container { padding: 20px 1rem 48px; } .algorithm-page .algorithm-header h1 { font-size: 1.85rem; } }
+
+
+
+.algorithm-page .catalog-tools { margin: 0 0 36px; }
+.algorithm-page .catalog-tools > .el-input { display: block; max-width: 560px; margin: 0 auto 24px; }
+.algorithm-page .category-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.algorithm-page .category-filters button { padding: 9px 14px; border: 1px solid #e0e6f0; border-radius: 10px; background: #fff; color: #62758b; font: inherit; font-size: 13px; cursor: pointer; }
+.algorithm-page .category-filters button.active { border-color: #667eea; background: #eef0ff; color: #5268cc; }
+.algorithm-page .category-filters button:focus-visible, .algorithm-page .algorithm-card:focus-visible { outline: 3px solid #667eea; outline-offset: 3px; }
+.algorithm-page .algorithm-group { margin-bottom: 36px; }
+.algorithm-page .algorithm-group h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 20px; font-size: 20px; }
+.algorithm-page .algorithm-group h2 i { color: #667eea; }
+.algorithm-page .algorithm-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.algorithm-page .algorithm-card { display: flex; align-items: center; gap: 14px; min-width: 0; padding: 22px; border: 1px solid #dfe6f0; border-radius: 18px; background: #fff; color: #223248; text-decoration: none; box-shadow: 0 12px 36px #1f29370a; transition: border-color .2s, box-shadow .2s; }
+.algorithm-page .algorithm-card:hover { border-color: #b9c4ff; box-shadow: 0 16px 38px #1f293712; }
+.algorithm-page .algorithm-card-icon { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 14px; background: #eef0ff; color: #667eea; font-size: 21px; }
+.algorithm-page .algorithm-card-label { display: flex; flex: 1; flex-direction: column; gap: 6px; min-width: 0; }
+.algorithm-page .algorithm-card-label strong { font-size: 15px; overflow-wrap: anywhere; }
+.algorithm-page .algorithm-card-label small { color: #8794a6; overflow-wrap: anywhere; }
+.algorithm-page .algorithm-card > .el-icon-arrow-right { color: #8794a6; }
+@media (max-width: 1100px) { .algorithm-page .algorithm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .algorithm-page .algorithm-grid { grid-template-columns: 1fr; } .algorithm-page .algorithm-card { padding: 18px; } .algorithm-page .category-filters { justify-content: flex-start; } }
+@media (prefers-reduced-motion: reduce) { .algorithm-page .algorithm-card { transition: none; } }
+
+
+.algorithm-page.algorithm-demo-page { min-height: calc(100vh - 70px); }
+.algorithm-page.algorithm-demo-page .algorithm-container { padding: 12px 2rem 64px; }
+.algorithm-page .demo-header { display: flex; align-items: center; gap: 16px; min-height: 36px; margin: 0 0 10px; }
+.algorithm-page .demo-header .back-link { flex-shrink: 0; padding: 4px 0; font-size: 13px; }
+.algorithm-page .demo-title { display: flex; flex: 1; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; min-width: 0; }
+.algorithm-page .demo-title h1 { margin: 0; font-size: 22px; line-height: 1.3; }
+.algorithm-page .demo-title > span { color: #8794a6; font-size: 12px; }
+.algorithm-page .demo-panel { border: 1px solid #dfe6f0; border-radius: 18px; background: #fff; box-shadow: 0 12px 36px #1f29370a; }
+.algorithm-page .control-dock { position: sticky; top: 70px; z-index: 20; border-radius: 18px 18px 0 0; background: #fff; box-shadow: 0 2px 6px #1f293706; }
+.algorithm-page .algorithm-controls { padding: 10px 14px; }
+.algorithm-page .algorithm-controls #AlgorithmSpecificControls { display: flex; flex-wrap: wrap; align-items: center; gap: 7px 12px; width: 100%; border-spacing: 0; font-size: 13px; color: #52657c; }
+.algorithm-page .algorithm-controls td { display: inline-flex; align-items: center; gap: 5px; padding: 0; }
+.algorithm-page .algorithm-controls tr { display: flex; flex-wrap: wrap; gap: 6px; }
+.algorithm-page .algorithm-controls input[type="text"] { width: 88px; max-width: 160px; height: 30px; padding: 0 8px; box-sizing: border-box; border: 1px solid #d9e0ed; border-radius: 6px; color: #34465c; background: #fff; }
+.algorithm-page .algorithm-controls input[type="button"] { min-height: 30px; padding: 5px 10px; border: 1px solid #dce1ff; border-radius: 6px; background: #eef1ff; color: #5268cc; font-size: 13px; cursor: pointer; }
+.algorithm-page .algorithm-controls input:disabled { opacity: .5; cursor: not-allowed; }
+.algorithm-page .algorithm-controls input[type="radio"], .algorithm-page .algorithm-controls input[type="checkbox"] { accent-color: #667eea; }
+.algorithm-page .algorithm-controls input:focus-visible { outline: 2px solid #667eea; outline-offset: 2px; }
+.algorithm-page .playback-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 8px 14px; border-top: 1px solid #edf0f6; border-bottom: 1px solid #edf0f6; background: #f8faff; }
+.algorithm-page .playback-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.algorithm-page .playback-buttons .el-button { margin: 0; padding: 7px 10px; }
+.algorithm-page .speed-control { display: flex; align-items: center; gap: 8px; color: #6b7d92; font-size: 12px; }
+.algorithm-page .speed-control input { width: 110px; accent-color: #667eea; }
+.algorithm-page .speed-control span { min-width: 22px; font-variant-numeric: tabular-nums; }
+.algorithm-page .canvas-settings { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.algorithm-page .animation-state { color: #6b7d92; font-size: 12px; }
+.algorithm-page .canvas-settings .el-switch__label { font-size: 12px; }
+.algorithm-page .canvas-viewport { overflow-x: auto; overflow-y: hidden; border-radius: 0 0 18px 18px; background: #fff; }
+.algorithm-page .canvas-viewport canvas { display: block; width: 1000px; height: 500px; margin: 0 auto; }
+.algorithm-page .demo-hint { margin: 8px 0 0; color: #8794a6; font-size: 12px; line-height: 1.6; }
+.algorithm-page .error-alert { margin-bottom: 10px; }
+@media (max-width: 768px) {
+    .algorithm-page.algorithm-demo-page { min-height: calc(100vh - 60px); }
+    .algorithm-page.algorithm-demo-page .algorithm-container { padding: 8px 1rem 48px; }
+    .algorithm-page .demo-header { gap: 10px; }
+    .algorithm-page .demo-title h1 { font-size: 18px; }
+    .algorithm-page .demo-title > span { display: none; }
+    .algorithm-page .control-dock { top: 60px; }
+    .algorithm-page .algorithm-controls { padding: 8px 10px; }
+    .algorithm-page .playback-bar { gap: 8px 12px; padding: 8px 10px; }
+    .algorithm-page .playback-buttons { gap: 5px; }
+    .algorithm-page .canvas-settings { gap: 8px; }
+}

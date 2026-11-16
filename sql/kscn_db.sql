@@ -152,9 +152,12 @@ CREATE TABLE `system_message_popup_record` (
 # =========================
 CREATE TABLE `file_storage` (
     `storage_id` BIGINT AUTO_INCREMENT COMMENT '物理文件ID',
-    `file_md5` VARCHAR(64) NOT NULL COMMENT '文件MD5唯一标识',
+    `file_md5` VARCHAR(64) DEFAULT NULL COMMENT '本地文件MD5，远程链接为空',
     `file_size` BIGINT NOT NULL COMMENT '文件大小（字节）',
-    `file_path` VARCHAR(500) NOT NULL COMMENT '磁盘真实路径',
+    `file_path` VARCHAR(500) DEFAULT NULL COMMENT '本地磁盘路径，远程链接为空',
+    `source_type` VARCHAR(10) NOT NULL DEFAULT 'LOCAL' COMMENT 'LOCAL本地存储，REMOTE远程链接',
+    `remote_url` TEXT DEFAULT NULL COMMENT '远程原始链接，不向普通文件列表返回',
+    `size_known` TINYINT NOT NULL DEFAULT 1 COMMENT '存储源大小是否已知；远程逻辑文件大小为0，不占云盘容量',
     `ref_count` INT NOT NULL DEFAULT 1 COMMENT '引用次数',
     `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态（0-已删除，1-正常）',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -176,10 +179,13 @@ CREATE TABLE `user_file` (
     `file_size` BIGINT NOT NULL DEFAULT 0 COMMENT '文件大小',
     `file_type` VARCHAR(50) DEFAULT NULL COMMENT '文件类型后缀',
     `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除（回收站）',
+    `delete_time` DATETIME DEFAULT NULL COMMENT '移入回收站的时间，7天后永久删除',
+    `delete_batch` VARCHAR(36) DEFAULT NULL COMMENT '一次删除文件夹及其子项的批次',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`file_id`),
     INDEX `idx_user_parent` (`user_id`, `parent_id`),
+    INDEX `idx_user_recycle_expiry` (`is_deleted`, `delete_time`),
     CONSTRAINT `fk_user_file_user` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`),
     CONSTRAINT `fk_user_file_storage` FOREIGN KEY (`storage_id`) REFERENCES `file_storage`(`storage_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户文件系统表';
@@ -199,9 +205,17 @@ CREATE TABLE `public_file` (
     `category` VARCHAR(100) DEFAULT NULL COMMENT '分类',
     `download_count` INT NOT NULL DEFAULT 0 COMMENT '下载次数',
     `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除（0-正常，1-已删除）',
+    `delete_time` DATETIME DEFAULT NULL COMMENT '移入回收站的时间，7天后永久删除',
+    `delete_batch` VARCHAR(36) DEFAULT NULL COMMENT '一次删除文件夹及其子项的批次',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`file_id`),
     INDEX `idx_public_parent` (`parent_id`),
+    INDEX `idx_public_recycle_expiry` (`is_deleted`, `delete_time`),
     CONSTRAINT `fk_public_file_storage` FOREIGN KEY (`storage_id`) REFERENCES `file_storage`(`storage_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='公共文件系统表';
+
+CREATE TABLE `file_namespace_lock` (
+    `scope_key` VARCHAR(64) NOT NULL,
+    PRIMARY KEY (`scope_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件空间回收站操作事务锁';

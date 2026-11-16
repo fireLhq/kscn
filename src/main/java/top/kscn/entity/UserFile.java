@@ -7,6 +7,16 @@ import java.time.LocalDateTime;
  * 存储用户的文件/文件夹逻辑结构
  */
 public class UserFile {
+    private String sourceType;
+    private Long remoteSize;
+    private Boolean sizeKnown;
+    public String getSourceType() { return sourceType; }
+    public void setSourceType(String value) { sourceType = value; }
+    public Long getRemoteSize() { return remoteSize; }
+    public void setRemoteSize(Long value) { remoteSize = value; }
+    public Boolean getSizeKnown() { return sizeKnown; }
+    public void setSizeKnown(Boolean value) { sizeKnown = value; }
+    public boolean isRemote() { return "REMOTE".equals(sourceType); }
     private Long fileId;             // 文件ID
     private Long userId;             // 所属用户ID
     private Long parentId;           // 父文件夹ID（NULL为根目录）
@@ -16,6 +26,13 @@ public class UserFile {
     private Long fileSize;           // 文件大小
     private String fileType;         // 文件类型后缀
     private Integer isDeleted;       // 是否删除（回收站）
+    private LocalDateTime deleteTime;
+    private String deleteBatch;
+
+    public LocalDateTime getDeleteTime() { return deleteTime; }
+    public void setDeleteTime(LocalDateTime deleteTime) { this.deleteTime = deleteTime; }
+    public String getDeleteBatch() { return deleteBatch; }
+    public void setDeleteBatch(String deleteBatch) { this.deleteBatch = deleteBatch; }
     private LocalDateTime createTime; // 创建时间
     private LocalDateTime updateTime; // 更新时间
     

@@ -10,23 +10,25 @@ import java.util.List;
  */
 @Mapper
 public interface UserFileMapper {
+    String FILE_COLUMNS = "user_file.*, (SELECT source_type FROM file_storage s WHERE s.storage_id = user_file.storage_id) AS source_type, (SELECT file_size FROM file_storage s WHERE s.storage_id = user_file.storage_id) AS remote_size, (SELECT size_known FROM file_storage s WHERE s.storage_id = user_file.storage_id) AS size_known";
+
 
     /**
      * 根据ID查询文件
      */
-    @Select("SELECT * FROM user_file WHERE file_id = #{fileId} AND is_deleted = 0")
+    @Select("SELECT " + FILE_COLUMNS + " FROM user_file WHERE file_id = #{fileId} AND is_deleted = 0")
     UserFile selectById(@Param("fileId") Long fileId);
 
     /**
      * 查询用户指定目录下的文件列表
      */
-    @Select("SELECT * FROM user_file WHERE user_id = #{userId} AND parent_id <=> #{parentId} AND is_deleted = 0 ORDER BY is_folder DESC, file_name ASC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM user_file WHERE user_id = #{userId} AND parent_id <=> #{parentId} AND is_deleted = 0 ORDER BY is_folder DESC, file_name ASC")
     List<UserFile> selectByUserAndParent(@Param("userId") Long userId, @Param("parentId") Long parentId);
 
     /**
      * 根据用户ID和文件路径查询文件
      */
-    @Select("SELECT * FROM user_file WHERE user_id = #{userId} AND parent_id <=> #{parentId} AND file_name = #{fileName} AND is_deleted = 0")
+    @Select("SELECT " + FILE_COLUMNS + " FROM user_file WHERE user_id = #{userId} AND parent_id <=> #{parentId} AND file_name = #{fileName} AND is_deleted = 0")
     UserFile selectByUserAndPath(@Param("userId") Long userId, @Param("parentId") Long parentId, @Param("fileName") String fileName);
 
     /**
@@ -70,19 +72,19 @@ public interface UserFileMapper {
     /**
      * 查询文件夹下的所有子文件（递归查询用）
      */
-    @Select("SELECT * FROM user_file WHERE parent_id = #{parentId} AND is_deleted = 0")
+    @Select("SELECT " + FILE_COLUMNS + " FROM user_file WHERE parent_id = #{parentId} AND is_deleted = 0")
     List<UserFile> selectByParentId(@Param("parentId") Long parentId);
 
     /**
      * 搜索文件
      */
-    @Select("SELECT * FROM user_file WHERE user_id = #{userId} AND file_name LIKE CONCAT('%', #{keyword}, '%') AND is_deleted = 0 ORDER BY is_folder DESC, file_name ASC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM user_file WHERE user_id = #{userId} AND file_name LIKE CONCAT('%', #{keyword}, '%') AND is_deleted = 0 ORDER BY is_folder DESC, file_name ASC")
     List<UserFile> searchByKeyword(@Param("userId") Long userId, @Param("keyword") String keyword);
 
     /**
      * 查询用户的回收站文件
      */
-    @Select("SELECT * FROM user_file WHERE user_id = #{userId} AND is_deleted = 1 ORDER BY update_time DESC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM user_file WHERE user_id = #{userId} AND is_deleted = 1 ORDER BY update_time DESC")
     List<UserFile> selectDeletedFiles(@Param("userId") Long userId);
 
     /**
@@ -94,7 +96,7 @@ public interface UserFileMapper {
     /**
      * 查询用户所有文件夹（构建树形结构用）
      */
-    @Select("SELECT * FROM user_file WHERE user_id = #{userId} AND is_folder = 1 AND is_deleted = 0 ORDER BY file_name ASC")
+    @Select("SELECT " + FILE_COLUMNS + " FROM user_file WHERE user_id = #{userId} AND is_folder = 1 AND is_deleted = 0 ORDER BY file_name ASC")
     List<UserFile> selectAllFolders(@Param("userId") Long userId);
     
     /**

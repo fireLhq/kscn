@@ -9,8 +9,22 @@
 
                 <div class="desktop-menu">
                     <router-link to="/" exact class="nav-link">首页</router-link>
-                    <router-link to="/public-files" class="nav-link">资源</router-link>
-                    <router-link to="/user-files" class="nav-link">云盘</router-link>
+                    <el-dropdown v-if="isAdmin" :trigger="userDropdownTrigger" @command="handleMobileCommand">
+                        <router-link to="/public-files" class="nav-link">资源</router-link>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="/public-files">公共文件</el-dropdown-item>
+                            <el-dropdown-item v-if="isAdmin" command="/public-files?view=recycle">公共回收站</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                    <router-link v-else to="/public-files" class="nav-link">资源</router-link>
+                    <el-dropdown v-if="isLoggedIn" :trigger="userDropdownTrigger" @command="handleMobileCommand">
+                        <router-link to="/user-files" class="nav-link">云盘</router-link>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="/user-files">我的云盘</el-dropdown-item>
+                            <el-dropdown-item v-if="isLoggedIn" command="/user-files?view=recycle">我的回收站</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                    <router-link v-else to="/user-files" class="nav-link">云盘</router-link>
                     <router-link to="/service" class="nav-link">服务</router-link>
                     <router-link
                         v-if="isAdmin"
@@ -31,7 +45,9 @@
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item command="/">首页</el-dropdown-item>
                         <el-dropdown-item command="/public-files">资源</el-dropdown-item>
+                        <el-dropdown-item v-if="isAdmin" command="/public-files?view=recycle">公共回收站</el-dropdown-item>
                         <el-dropdown-item command="/user-files">云盘</el-dropdown-item>
+                        <el-dropdown-item v-if="isLoggedIn" command="/user-files?view=recycle">我的回收站</el-dropdown-item>
                         <el-dropdown-item command="/service">服务</el-dropdown-item>
                         <el-dropdown-item v-if="isAdmin" command="/admin">管理</el-dropdown-item>
                     </el-dropdown-menu>
@@ -209,7 +225,7 @@ export default {
             this.$router.push("/login");
         },
         handleMobileCommand(path) {
-            if (this.$route.path === path) {
+            if (this.$route.fullPath === path) {
                 window.scrollTo({ top: 0, behavior: "smooth" });
             } else {
                 const targetRoute = this.$router.resolve(path).route;
